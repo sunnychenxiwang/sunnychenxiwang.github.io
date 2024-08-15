@@ -1,0 +1,4 @@
+baseURL = "https://sunnychenxiwang.github.io/"
+languageCode = "zh-cn"
+title = "wcx blog"
+theme = "hugo-theme-stack"
