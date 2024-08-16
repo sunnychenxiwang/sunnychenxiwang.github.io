@@ -6,7 +6,1263 @@
         <description>Recent content in Posts on wcx blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
-        <lastBuildDate>Fri, 16 Aug 2024 11:08:12 +0800</lastBuildDate><atom:link href="https://sunnychenxiwang.github.io/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Fri, 16 Aug 2024 11:28:31 +0800</lastBuildDate><atom:link href="https://sunnychenxiwang.github.io/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>自然语言处理基础</title>
+        <link>https://sunnychenxiwang.github.io/post/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%9F%BA%E7%A1%80/</link>
+        <pubDate>Fri, 16 Aug 2024 11:28:31 +0800</pubDate>
+        
+        <guid>https://sunnychenxiwang.github.io/post/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%9F%BA%E7%A1%80/</guid>
+        <description>&lt;h1 id=&#34;自然语言处理基础&#34;&gt;自然语言处理基础
+&lt;/h1&gt;&lt;p&gt;主要根据cs224n做笔记，动手学深度学习为辅&lt;/p&gt;
+&lt;p&gt;参考资源&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://web.stanford.edu/class/cs224n/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;http://web.stanford.edu/class/cs224n/&lt;/a&gt;：课件、作业、附件阅读资料&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://showmeai.tech/article-detail/235&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://showmeai.tech/article-detail/235&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/Yiming-Wange/CS224n-2023-solution&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/Yiming-Wange/CS224n-2023-solution&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;wordvec&#34;&gt;WordVec
+&lt;/h2&gt;&lt;p&gt;如何在计算机表达词的意义&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;WordNet：构建一个包含同义词集和上位词（从属关系，动物是“狗”、“猫”、“鸟”等具体动物的上位词）的列表的辞典。问题：1）忽略词汇的细微差别，也不能定量计算单词的相似性。2）难以持续更新。3）由人工构建，带有主观性以及成本高&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;WordNet是一个词汇数据库，记录了单词之间的语义关系，包括同义词、下义词和部分义词等语义关联。同义词被组织成同义词集，配有简短的定义和使用示例。它可以被看作是字典和词典的结合和延伸。虽然可以通过网络浏览器访问，但其主要用途是用于自动文本分析和人工智能应用。最初是用英语创建的，英语WordNet数据库和软件工具以BSD风格许可证发布，并可从WordNet网站免费下载。现在已经有200多种语言的WordNet。
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 同义词集&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; nltk.corpus &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; wordnet &lt;span style=&#34;color:#66d9ef&#34;&gt;as&lt;/span&gt; wn
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;poses &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; { &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;n&amp;#39;&lt;/span&gt;:&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;noun&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;v&amp;#39;&lt;/span&gt;:&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;verb&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;s&amp;#39;&lt;/span&gt;:&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;adj (s)&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;a&amp;#39;&lt;/span&gt;:&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;adj&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;r&amp;#39;&lt;/span&gt;:&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;adv&amp;#39;&lt;/span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; synset &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; wn&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;synsets(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;good&amp;#34;&lt;/span&gt;):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	print(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;{}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;: &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;{}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;format(poses[synset&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;pos()], &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;, &amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;join([l&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;name() &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; l &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; synset&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;lemmas()])))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 上位词&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; nltk.corpus &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; wordnet &lt;span style=&#34;color:#66d9ef&#34;&gt;as&lt;/span&gt; wn
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;panda &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; wn&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;synset(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;panda.n.01&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hyper &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;lambda&lt;/span&gt; s: s&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;hypernyms()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;list(panda&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;closure(hyper))
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;词汇的离散表征：将每个词语看作单独离散的符号，并把单词表征为独热编码。问题：1）每个词向量之间正交不能很好的建模单词之间的相似性。2）向量维度大，每增加一个单词就增加一个维度。解决方案：通过大量数据学习词向量本身相似性，获得更精确的稠密词向量编码&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;基于上下文词汇表征。核心思想：一个单词的意思是由经常出现在它附近的单词给出的。方法：当一个单词w出现在文本中时，它的上下文是出现在其附近的一组单词（在一个固定大小的窗口中）。基于海量数据，使用w的许多上下文来构建w的表示&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Word2vec&lt;/p&gt;
+&lt;p&gt;以下以Skip-gram为例&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;核心思路&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;基于海量文本语料库构建&lt;/li&gt;
+&lt;li&gt;词汇表中的每个单词都由一个向量表示（学习完成后会固定）&lt;/li&gt;
+&lt;li&gt;对应语料库文本中的每个位置 &lt;img src=&#34;https://www.zhihu.com/equation?tex=t&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;公式&#34;
+	
+	
+&gt;，有一个中心词 &lt;img src=&#34;https://www.zhihu.com/equation?tex=c&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;公式&#34;
+	
+	
+&gt; 和一些上下文(“外部”)单词 &lt;img src=&#34;https://www.zhihu.com/equation?tex=o&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;公式&#34;
+	
+	
+&gt;&lt;/li&gt;
+&lt;li&gt;在固定窗口内预测上下文单词，使用 &lt;img src=&#34;https://www.zhihu.com/equation?tex=c&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;公式&#34;
+	
+	
+&gt; 和 &lt;img src=&#34;https://www.zhihu.com/equation?tex=o&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;公式&#34;
+	
+	
+&gt; 的词向量来计算概率 &lt;img src=&#34;https://www.zhihu.com/equation?tex=P%28o%7Cc%29&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;公式&#34;
+	
+	
+&gt;，即给定中心词推断上下文词汇的概率（反之亦然)&lt;/li&gt;
+&lt;li&gt;模型会遍历整个语料库中的每个单词，使用中心单词向量预测周围的单词（Skip-Gram），不断调整词向量（更新向量参数）来最大化这个概率（预测上下文）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;似然函数与目标函数
+$$
+对于每个位置t=1,&amp;hellip;T,在大小为m的固定窗口内预测上下文单词,\theta为模型包含的所有待优化权重变量,给定中心词w_j,似然函数为:\
+\text{Likelihood} = L(\theta) = \prod_{t=1}^{T} \prod_{\substack{j \neq 0 \ -m \leq j \leq m}} P(w_{t+j} \mid w_t ; \theta)\
+对应上述似然函数的目标函数J(θ)可以取作(平均)负对数似然:\
+J(\theta) = -\frac{1}{T} \log L(\theta) = -\frac{1}{T} \sum_{t=1}^{T} \sum_{\substack{j \neq 0 \ -m \leq j \leq m}} \log P(w_{t+j} \mid w_t ; \theta)
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如何计算概率值：U V矩阵每行代表一个单词的词向量，点乘后得到的分数通过softmax映射为概率分布。得到的概率分布是对于该中心词而言的上下文中单词的概率分布，该分布与上下文所在的具体位置无关，所以在每个位置的预测都是一样的。the、and、that、of等停用词，是每个单词点乘后得到的较大概率的单词，去掉这一部分可以使词向量效果更好。&lt;img src=&#34;C:/Users/wcx/Desktop/%e8%87%aa%e7%84%b6%e8%af%ad%e8%a8%80%e5%a4%84%e7%90%86%e5%9f%ba%e7%a1%80/images/word2vec/%e5%8f%82%e6%95%b0%e8%ae%a1%e7%ae%97.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;
+$$
+对于每个词w都会用两个向量:当w是中心词时，我们标记词向量为v_w,当w是上下文词时，我们标记词向量为u_w.\
+P(o\mid c) = \frac{\exp(u_o^T v_c)}{\sum_{w \in V} \exp(u_w^T v_c)}\
+向量u_o和向量v_c进行点乘.向量之间越相似,点乘结果越大,从而归一化后得到的概率值也越大\
+模型训练为最大化当出现中心词c时 其上下文单词为o的概率\
+模型的训练正是为了使得具有相似上下文的单词,具有相似的向量\
+取幂使任何数都为正 分母对整个词汇表进行标准化,从而给出概率分布\
+使用了softmax将任意x_i映射到概率分布p_i  \text{softmax}(x_i) = \frac{\exp(x_i)}{\sum_{j=1}^{n} \exp(x_j)} = p_i\
+softmax的理解:max因为放大了最大的概率,soft因为仍然为较小的x_i赋予了一定概率
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;word2vec使用梯度下降训练步骤
+$$
+1.随机初始化u_w\in R^d和v_w\in R^d\
+2.计算参数梯度\
+\frac{\partial}{\partial v_c}\log P(o \mid c)
+= \frac{\partial}{\partial v_c}\log\frac{ \exp(u_o^T v_c)}{\sum_{w \in V} \exp(u_w^T v_c)} \
+= \frac{\partial}{\partial v_c}\left(\log \exp(u_o^T v_c) - \log \sum_{w \in V} \exp(u_w^T v_c)\right) \
+= \frac{\partial}{\partial v_c}\left(u_o^T v_c - \log \sum_{w \in V} \exp(u_w^T v_c)\right) \
+= u_o - \frac{\sum_{w \in V} \exp(u_w^T v_c) u_w}{\sum_{w \in V} \exp(u_w^T v_c)}\
+= u_o - \sum_{w \in V} \frac{{\exp(u_w^T v_c)}}{{\sum_{w \in V} \exp(u_{w}^T v_c)}} u_w \
+= u_o - \sum_{w \in V} P(w\mid c)u_w \
+= u_o - \mathbb{E}[u_w]\
+=observed - expected\
+易得\sum_{w \in V} P(w\mid c)=1, 则当P(o\mid c)\rightarrow 1使\sum_{w \in V} P(w\mid c)u_w\rightarrow u_o,此时我们不需要调整v_c反之则相应调整v_c \ \
+\frac{\partial}{\partial u_o}\log P(o \mid c) = \frac{\partial}{\partial u_o}\log\frac{\exp(u_o^T v_c)}{\sum_{w \in V} \exp(u_w^T v_c)}\
+= \frac{\partial}{\partial u_o}\left(\log \exp(u_o^T v_c) - \log \sum_{w \in V} \exp(u_w^T v_c)\right) \
+= \frac{\partial}{\partial u_o}\left(u_o^T v_c - \log \sum_{w \in V} \exp(u_w^T v_c)\right)\
+= v_c - \frac{\sum \frac{\partial}{\partial u_o} \exp(u_w^T v_c)}{\sum_{w \in V}\exp(u_w^T v_c)} v_c \
+= v_c - \frac{\exp(u_o^T v_c)}{\sum_{w \in V}\exp(u_w^T v_c)} v_c\
+= v_c - P(o \mid c) v_c\
+= (1 - P(o \mid c)) v_c\
+当P(o \mid c) \rightarrow 1 即通过中心词c我们可以正确预测上下文词o,此时我们不需要调整u_o反之则相应调整u_o\\
+对于非中心词的梯度如下:\
+\frac{\partial}{\partial u_w}\log P(o \mid c)=\frac{\partial}{\partial u_w}\left(\log \exp(u_o^T v_c) - \log \sum_{w \in V} \exp(u_w^T v_c)\right)=0-\frac{\exp(u_o^T v_c)}{\sum_{w \in V}\exp(u_w^T v_c)} v_c=- P(o \mid c) v_c&lt;/p&gt;
+&lt;p&gt;\
+3.使用优化算法更新参数\
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;负采样目标函数&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;​	背景：softmax中用于归一化的分母的计算代价太高&lt;/p&gt;
+&lt;p&gt;​	思路：使用一个 true pair (中心词及其上下文窗口中的词)与几个 noise pair (中心词与随机词搭配) 形成的样本，训练二元逻辑回归。&lt;/p&gt;
+&lt;p&gt;​	优点：1）训练速度快。2）减小内存&lt;/p&gt;
+&lt;p&gt;​	缺点：1）参数设置敏感：负采样中负采样的数量以及负例词的选择都会影响模型的性能。2）对低频词效果差：负采样会给予高频词	更多的权重，因此对于低频词的表示效果可能会有所下降。
+$$
+J_{\text{skip-gram}} = -\log \sigma(\mathbf{v}&lt;em&gt;{w_c}^\top \mathbf{v}&lt;/em&gt;{w_t}) - \sum_{w_n \in D} \log \sigma(-\mathbf{v}&lt;em&gt;{w_n}^\top \mathbf{v}&lt;/em&gt;{w_t})\&lt;/p&gt;
+&lt;p&gt;\sigma(x) 是逻辑函数，也称为sigmoid函数，定义为\sigma(x) = \frac{1}{1 + e^{-x}}\
+\mathbf{v}&lt;em&gt;{w_t}是目标词w_t的词向量表示。\
+\mathbf{v}&lt;/em&gt;{w_c}是上下文词w_c的词向量表示。\
+\mathbf{v}&lt;em&gt;{w_n}是负例词w_n的词向量表示。\
+D是负例样本集合，包含了从词汇表中随机选择的一些负例词。\
+第一项表示了正例样本的贡献，即目标词w_t和上下文词w_c的内积的sigmoid函数的负对数。\
+第二项表示了负例样本的贡献，即目标词w_t和负例词w_n的内积的sigmoid函数的负对数之和。\
+这个目标函数的目标是最大化正例样本的概率，同时最小化负例样本的概率\\
+对于skip-gram,一对匹配的上下词和中心词是在一个windows内计算.对于一个窗口内的目标函数如下:\
+J&lt;/em&gt;{\text{skip-gram}}(\mathbf{v}&lt;em&gt;c, \mathbf{w}&lt;/em&gt;{t-m}, \ldots, \mathbf{w}&lt;em&gt;{t+m}, U) = \sum&lt;/em&gt;{-m \leq j \leq m, j \neq 0} J(\mathbf{v}&lt;em&gt;c, \mathbf{w}&lt;/em&gt;{t+j}, U)\
+其中中心词为w_t,其余窗口内的词为其匹配的上下文词
+$$&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;优化算法
+$$
+梯度下降算法:\alpha\space is\space step\space size\space or\space learning\space rate   \
+update\space eq\space in\space matrix\space notation:\theta_{\text{new}} = \theta_{\text{old}} - \alpha \nabla_{\theta} J(\theta)\
+update\space eq\space for\space single\space param:\theta_{j_{\text{new}}} = \theta_{j_{\text{old}}} - \alpha \frac{\partial J(\theta)}{\partial \theta_{j_{\text{old}}}}
+$$&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;while&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;True&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# J is object func;corpus is dataset;theta is params&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# 考虑到每一个词语都是参数 故遍历每一个词语的参数 计算其梯度 并更新&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# 更新参数时用所有样本进行更新(评估语料中每一个样本的梯度 并这个用这个梯度更新全部参数)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# 问题:计算非常耗资源且计算时间太长&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    theta_grad &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; eval_grad(J, corpus, theta) 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    theta &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; theta &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt; alpha &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; theta_grad
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;$$
+随机梯度下降算法:每次epoch随机选择单个样本计算梯度并用其来更新所有样本参数\space随机梯度是对完整梯度的无偏估计\
+但基于单个样本更新会表现为参数震荡很厉害,收敛过程并不平稳.一般考虑动态调整学习率或使用mini-batch梯度下降\
+batch下降:指每次参数更新使用所有样本,即所有样本都代入计算一遍,然后取它们的梯度均值,来对参数进行一次性更新.batch_size=数据集大小.相当于一次epoch更新一次参数,梯度使用的是计算所有梯度的均值\
+Mini-batch:每次参数更新使用一小批样本,每次计算这批样本的梯度均值更新.相当于一次epoch更新dataiter_size次参数
+\mini_bacth具有以下优点:通过batch平均,减少梯度估计的噪音;在GPU上并行化运算,加快运算速度
+$$&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;while&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;True&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#75715e&#34;&gt;# 计算随机选取样本中参数的梯度 如果window=1则为SGD,window_size=m(数据集大小)则为batch下降 否则为mini-batch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    window &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; sample_window(corpus)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    theta_grad &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; eval_grad(J, window, theta) 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    theta &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; theta &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt; alpha &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; theta_grad
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;word2vec训练得到的词向量分布体现语义相似度&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;共现矩阵&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;概念：基于窗口或全文档进行采样，对每个中心词周围的单词进行计数，构建计数矩阵。&lt;/li&gt;
+&lt;li&gt;优势：1）能很好的利用全局信息&lt;/li&gt;
+&lt;li&gt;共现矩阵的问题：1）使用共现次数衡量单词的相似性，但是会随着词汇量的增加而增大矩阵的大小。2）需要很多空间来存储这一高维矩阵。3）后续的分类模型也会由于矩阵的稀疏性而存在稀疏性问题，使得效果不佳。解决方案：矩阵降维（奇异值分解）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Glove&lt;/p&gt;
+&lt;p&gt;可参考&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/u014665013/article/details/79642083?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522170782019616800192212606%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&amp;amp;request_id=170782019616800192212606&amp;amp;biz_id=0&amp;amp;utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-1-79642083-null-null.142%5ev99%5epc_search_result_base2&amp;amp;utm_term=Glove&amp;amp;spm=1018.2226.3001.4187&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;blog1&lt;/a&gt;和&lt;a class=&#34;link&#34; href=&#34;https://showmeai.tech/article-detail/232&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;blog2&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;目标同上述工作类似，都是需要得到能很好表示语义的词向量&lt;/li&gt;
+&lt;li&gt;思路：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Glove、skip-gram、CBOW对比&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;skip-gram、CBOW是在窗口内进行，缺乏了整体的词和词的关系，负样本采用sample的方式会缺失词的关系信息。&lt;/li&gt;
+&lt;li&gt;Global Vector融合了矩阵分解Latent Semantic Analysis (LSA)的全局统计信息和local context window优势。融入全局的先验统计信息，可以加快模型的训练速度，又可以控制词的相对权重。&lt;/li&gt;
+&lt;li&gt;skip-gram、CBOW每次都是用一个窗口中的信息更新出词向量，但是Glove则是用了全局的信息（共现矩阵，通过全局统计频数，可以计算得到概率值，这个概率值很好地代表了全局性。从而使得词向量去拟合），也就是多个窗口进行更新&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;classifier&#34;&gt;Classifier
+&lt;/h2&gt;&lt;h2 id=&#34;backpropagation&#34;&gt;BackPropagation
+&lt;/h2&gt;&lt;p&gt;非线性函数，详细参考&lt;a class=&#34;link&#34; href=&#34;https://cs231n.github.io/neural-networks-1/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;logistic (“sigmoid”) ，将x映射到0~1范围。&lt;/p&gt;
+&lt;p&gt;缺点：&lt;/p&gt;
+&lt;p&gt;（1）sigmoid的梯度消失，参考&lt;a class=&#34;link&#34; href=&#34;https://karpathy.medium.com/yes-you-should-understand-backprop-e2f06eab496b&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;：你的权重矩阵&lt;strong&gt;W&lt;/strong&gt;初始化得太大，矩阵乘法的输出可能有一个非常大的范围（例如-400到400之间的数字），这将使向量&lt;strong&gt;z&lt;/strong&gt;中的所有输出几乎都是二进制的：要么1要么0。使得上游梯度为0。从此时起，向后传递的其余部分将全部为零。（2）关于 sigmoid 的另一个不明显的有趣事实是，当 f = 0.5 时，其局部梯度 (f*(1-f)) 在 0.25 处达到最大值。这意味着每次梯度信号流过 sigmoid 门时，其幅度总是会减小四分之一（或更多）。如果使用基本 SGD，这将使网络的较低层训练速度比较高层慢得多。（3）sigmoid 输出不是以零为中心的，参考&lt;a class=&#34;link&#34; href=&#34;https://cs231n.github.io/neural-networks-1/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;
+$$
+\sigma(x) = \frac{1}{1 + e^{-x}}\
+对于h=f(z),f&lt;del&gt;is&lt;/del&gt;sigmoid~func\
+\frac{\partial h}{\partial z}=\frac{e^{-z}}{(1+e^{-z})^2}=f(z)\cdot (1-f(z))&lt;del&gt;upstream&lt;/del&gt;grad
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;tanh，将x映射到-1~1范围；tanh 只是一个重新调整和移位的 sigmoid 函数。
+$$
+\tanh(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}=2logistics(2\cdot x)-1
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Hardtanh
+$$
+\text{hardtanh}(x) = \begin{cases}
+-1 &amp;amp; \text{if } x &amp;lt; -1 \
+x &amp;amp; \text{if } -1 \leq x \leq 1 \
+1 &amp;amp; \text{if } x &amp;gt; 1
+\end{cases}
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ReLu：对于深度神经网络，现在首先要尝试的是ReLU：由于良好的梯度反向传播（ReLU 可以通过简单地将激活矩阵阈值设置为零，tanh和sigmoid计算较为昂贵），它训练速度快（线性）且表现良好；但是具有dead zone（输入小于等于0时 梯度恒等于0，导致相关神经元不会更新），解决办法：Leaky ReLu
+$$
+ReLu(x)=max(x,0)\
+LeakyReLu(x) = \begin{cases}
+x, &amp;amp; \text{if } x \geq 0 \
+\alpha x, &amp;amp; \text{otherwise}
+\end{cases}
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Maxout：它由多个线性函数组成，然后在每个位置上选择最大的线性函数的输出作为该位置的输出。神经元享有 ReLU 单元的所有优点（线性操作机制、无饱和），并且没有其缺点（垂死的 ReLU）。然而，与 ReLU 神经元不同的是，它使每个神经元的参数数量加倍，从而导致参数总数很高。
+$$
+\text{maxout}(x) = \max(w_1^T x + b_1, w_2^T x + b_2, \ldots, w_k^T x + b_k)
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;GELU：GELU is frequently used with Transformers (BERT, RoBERTa, etc.)
+$$
+\text{GeLU}(x) = \frac{1}{2} \left(1 + \text{erf}\left(\frac{x}{\sqrt{2}}\right)\right)\
+= x\cdot P(X≤x), X\in N(0,1)\
+≈ x\cdot logistic(1.702x)
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;为什么需要非线性函数？&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;没有非线性函数，深度神经网络无法做更多事情，只能进行线性变换：额外的层次可能会被编译成单一的线性变换：W1W2 x = Wx&lt;/li&gt;
+&lt;li&gt;如果有更多包含非线性函数的层次，它们就可以逼近任何复杂的函数！&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;交叉熵损失函数cross-entropy
+$$
+p是真实概率分布:假设一个真实的概率分布在正确类别处为1，在其他地方为0,即p = [0, …, 0, 1, 0, …, 0]\
+q是模型计算的概率分布\
+c是类别,需要计算所有类别.由于p是独热编码,则剩下的的唯一项是真实类别yi的负对数概率:− log(q_i)\
+H(p, q)=-\sum_{c=1}^C p(c)\cdot log(q(c))\
+我们的目标是最大化正确类别y的概率,或者等价地,我们可以最小化该类别的负对数概率
+$$&lt;/p&gt;
+&lt;p&gt;Gradient，详细参考&lt;a class=&#34;link&#34; href=&#34;http://cs231n.stanford.edu/handouts/derivatives.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;和&lt;a class=&#34;link&#34; href=&#34;http://web.stanford.edu/class/cs224n/readings/cs224n-2019-notes03-neuralnets.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;推导&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Given a function with 1 output and 1 input；It’s gradient (slope) is its derivative
+$$
+f(x)=x^3\
+\frac {df}{dx}=3x^2
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Given a function with 1 output and n inputs；Its gradient is a vector of partial derivatives with respect to each input
+$$
+f(x)=f(x_1,x_2,&amp;hellip;,x_n)\
+\frac {\partial f}{\partial x}=[\frac {\partial f}{\partial x_1},\frac {\partial f}{\partial x_2},&amp;hellip;,\frac {\partial f}{\partial x_n}]
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Given a function with m outputs and n inputs；It’s Jacobian is an m x n matrix of partial derivatives
+$$
+\bf f(x)=[f_1(x_1,x_2,&amp;hellip;,x_n),f_2(x_1,x_2,&amp;hellip;,x_n),..,f_m(x_1,x_2,&amp;hellip;,x_n)]\
+\frac {\partial f}{\partial x}=\begin{bmatrix}
+\frac{\partial f_1}{\partial x_1} &amp;amp; \frac{\partial f_1}{\partial x_2} &amp;amp; \cdots &amp;amp; \frac{\partial f_1}{\partial x_n} \
+\frac{\partial f_2}{\partial x_1} &amp;amp; \frac{\partial f_2}{\partial x_2} &amp;amp; \cdots &amp;amp; \frac{\partial f_2}{\partial x_n} \
+\vdots &amp;amp; \vdots &amp;amp; \ddots &amp;amp; \vdots \
+\frac{\partial f_m}{\partial x_1} &amp;amp; \frac{\partial f_m}{\partial x_2} &amp;amp; \cdots &amp;amp; \frac{\partial f_m}{\partial x_n}
+\end{bmatrix}\
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;1 output, nm inputs: 1 by mn Jacobian? Instead, we leave pure math and use the shape convention: the shape of the gradient is the shape of the parameters
+$$
+s=Wx+b, where&lt;del&gt;s&lt;/del&gt;is~scalar\
+\frac {\partial s}{\partial W}=\begin{bmatrix}
+\frac{\partial s}{\partial W_{11}} &amp;amp; \frac{\partial s}{\partial W_{12}} &amp;amp; \cdots &amp;amp; \frac{\partial s}{\partial W_{1n}} \&lt;/p&gt;
+&lt;p&gt;\vdots &amp;amp; \vdots &amp;amp; \ddots &amp;amp; \vdots \
+\frac{\partial s}{\partial W_{m1}} &amp;amp; \frac{\partial s}{\partial W_{m2}} &amp;amp; \cdots &amp;amp; \frac{\partial s}{\partial W_{mn}}
+\end{bmatrix}
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;m output, nm inputs
+$$
+f=Wx+b,W&lt;del&gt;and&lt;/del&gt;b&lt;del&gt;is&lt;/del&gt;params,x&lt;del&gt;is&lt;/del&gt;input.\
+f(x)=\begin{bmatrix}
+w_{11} &amp;amp; w_{12} &amp;amp; \cdots &amp;amp; w_{1n} \
+w_{21} &amp;amp; w_{22} &amp;amp; \cdots &amp;amp; w_{2n}\
+w_{31} &amp;amp; w_{32} &amp;amp; \cdots &amp;amp; w_{3n} \
+\vdots &amp;amp; \vdots &amp;amp; \ddots &amp;amp; \vdots \
+w_{m1} &amp;amp; w_{m2} &amp;amp; \cdots &amp;amp; w_{mn}
+\end{bmatrix}\cdot \begin{bmatrix} x_1\x_2\x_3\\vdots\x_n \end{bmatrix}+\begin{bmatrix} b_1\b_2\b_3\\vdots\b_m \end{bmatrix}=\begin{bmatrix} w_{11}\cdot x_1+w_{12}\cdot x_2+\cdots+w_{1n}\cdot x_n+b_1\w_{21}\cdot x_1+w_{22}\cdot x_2+\cdots+w_{2n}\cdot x_n+b_2\w_{31}\cdot x_1+w_{32}\cdot x_2+\cdots+w_{3n}\cdot x_n+b_3\\vdots\w_{m1}\cdot x_1+w_{m2}\cdot x_2+\cdots+w_{mn}\cdot x_n+b_m \end{bmatrix}\
+故f_1(x_1,x_2,\cdots,x_n)= w_{11}\cdot x_1+w_{12}\cdot x_2+\cdots+w_{1n}\cdot x_n+b_1\
+f_2(x_1,x_2,\cdots,x_n)= w_{21}\cdot x_1+w_{22}\cdot x_2+\cdots+w_{2n}\cdot x_n+b_2\
+\vdots\
+故\frac{\partial f}{\partial W}=\begin{bmatrix}
+\frac{\partial f_1}{\partial w_{11}} &amp;amp; \frac{\partial f_1}{\partial w_{12}} &amp;amp; \cdots &amp;amp; \frac{\partial f_1}{\partial w_{1n}} \
+\frac{\partial f_2}{\partial w_{21}} &amp;amp; \frac{\partial f_2}{\partial w_{22}} &amp;amp; \cdots &amp;amp; \frac{\partial f_2}{\partial w_{2n}} \
+\vdots &amp;amp; \vdots &amp;amp; \ddots &amp;amp; \vdots \
+\frac{\partial f_m}{\partial w_{m1}} &amp;amp; \frac{\partial f_m}{\partial w_{m2}} &amp;amp; \cdots &amp;amp; \frac{\partial f_m}{\partial w_{mn}}
+\end{bmatrix}=\begin{bmatrix} x_1 &amp;amp; x_2 &amp;amp;\cdots  &amp;amp;x_n \ x_1 &amp;amp; x_2 &amp;amp;\cdots  &amp;amp;x_n\ \vdots &amp;amp; \vdots &amp;amp; \ddots &amp;amp; \vdots\x_1 &amp;amp; x_2 &amp;amp;\cdots  &amp;amp;x_n \end{bmatrix}
+$$
+代码验证&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;tensor([[&lt;span style=&#34;color:#ae81ff&#34;&gt;1.&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;2.&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;3.&lt;/span&gt;]], requires_grad&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;True&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;view(&lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;) &lt;span style=&#34;color:#75715e&#34;&gt;# input&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;w &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;rand(&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;, requires_grad&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;True&lt;/span&gt;) &lt;span style=&#34;color:#75715e&#34;&gt;# params&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;print(x)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;print(w)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;matmul(w, x)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;print(y) 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;y&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;backward(torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;ones_like(y))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;print(w&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;grad)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#########################&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#tensor([[1.],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#        [2.],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#        [3.]], grad_fn=&amp;lt;ViewBackward0&amp;gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#tensor([[0.4173, 0.2071, 0.1727],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#        [0.7474, 0.9319, 0.6996]], requires_grad=True)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#tensor([[1.3498],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#        [4.7099]], grad_fn=&amp;lt;MmBackward0&amp;gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#tensor([[1., 2., 3.],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#        [1., 2., 3.]])&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#########################&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Elementwise activation Function‘s Jacobian matrix; Function has n outputs and n inputs(vectors-to-vectors) → n by n Jacobian
+$$
+\bf h=f(z)\
+h_i=f(z_i),such&lt;del&gt;as&lt;/del&gt;sigmoid\
+z=[z_1,z_2,\cdots,z_n],h=[f(z_1),f(z_2),\cdots,f(z_n)]\
+\frac {\partial h}{\partial z}同m&lt;del&gt;outputs&lt;/del&gt;and&lt;del&gt;n&lt;/del&gt;inputs情况一致\
+\frac {\partial h}{\partial z}=\begin{bmatrix} f&amp;rsquo;(z_1) &amp;amp; 0 &amp;amp;\cdots &amp;amp; 0 \ 0 &amp;amp; f&amp;rsquo;(z_2) &amp;amp;\cdots  &amp;amp; 0\ \vdots &amp;amp; \vdots &amp;amp; \ddots &amp;amp; \vdots\0 &amp;amp; 0 &amp;amp;\cdots  &amp;amp;f&amp;rsquo;(z_n) \end{bmatrix}=diag(f&amp;rsquo;(z))\
+对于极端情况偏差项bias(b \in R^n)类似,\frac {\partial (Wx+b)}{\partial b}=I(单位矩阵)
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;In a neural network，推导的example，参考&lt;a class=&#34;link&#34; href=&#34;https://cs231n.github.io/optimization-2/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;
+$$
+s=u^Th\
+h=f(z)&lt;del&gt;elementwise&lt;/del&gt;activate~func\
+z=Wx+b\
+\frac {\partial s}{\partial b}=\frac {\partial s}{\partial h}\cdot \frac {\partial h}{\partial z}\cdot \frac {\partial z}{\partial b}=u^T \cdot diag(f&amp;rsquo;(z))\cdot \frac {\partial z}{\partial b} \
+\frac {\partial s}{\partial W}=\frac {\partial s}{\partial h}\cdot \frac {\partial h}{\partial z}\cdot \frac {\partial z}{\partial W}=u^T \cdot diag(f&amp;rsquo;(z))\cdot \frac {\partial z}{\partial W}\
+可以避免重复计算,记\delta=u^T \cdot diag(f&amp;rsquo;(z)),是上游梯度(误差信号)
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;导数的形状&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;shape convention：导数的形状应该与参数的形状一致&lt;/li&gt;
+&lt;li&gt;冲突：雅可比矩阵（which makes the chain rule easy）可能会和形状规约（which makes implementing SGD easy）冲突。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;计算图&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;+ “distributes” the upstream gradient to each summand；max “routes” the upstream gradient（更大的会被更新，更小的梯度为0不会更新）；* “switches” the upstream gradient&lt;/li&gt;
+&lt;li&gt;正确计算方法：先计算出所有local gradient；然后根据链式法则递归计算&lt;/li&gt;
+&lt;li&gt;反向传播时间复杂度分析：1）先计算出所有节点的local gradient，O(N)。2）遍历拓扑图（广度优先搜索，按队列，每个节点只会入队一次和出队一次），时间复杂度也是O(N)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;训练常用技巧和注意事项&lt;/p&gt;
+&lt;p&gt;a bit more about neural network（作业需要）&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;正则化：能有效限制过拟合&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;dropout：以概率p随机将输入张量（主要是在中间的隐变量上操作）的一些元素归零。当模型更大时，本质上正则化不能限制过拟合。dropout是不错选择&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;初始化&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Optimizers&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;rnn&#34;&gt;RNN
+&lt;/h2&gt;&lt;p&gt;Language Modeling&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;什么是语言建模（本质）：&lt;strong&gt;预测下一个单词是什么&lt;/strong&gt;（the students opened their __&lt;em&gt;）
+$$
+p(x&lt;/em&gt;{t+1}|x_t,\dots,x_2,x_1)
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;构建语言模型&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Markov(n-gram)模型：Markov assumption: x&lt;!-- raw HTML omitted --&gt;t+1&lt;!-- raw HTML omitted --&gt;depends only on the preceding n-1 words
+$$
+n-gram&lt;del&gt;model:p(x_{t+1}|x_t,\dots,x_2,x_1)=p(x_{t+1}|x_t,\dots,x_{t-n+2})\=\frac{p(x_{t+1},\cdots,x_{t-n+2})}{p(x_t,\cdots,x_{t-n+2})}≈\frac {count(x_{t+1},\cdots,x_{t-n+2})}{count(x_t,\cdots,x_{t-n+2})}\
+Example:P(books|students&lt;/del&gt;opened&lt;del&gt;their) = \frac {count(students&lt;/del&gt;opened&lt;del&gt;their&lt;/del&gt;books)}{count(students&lt;del&gt;opened&lt;/del&gt;their)}
+$$
+问题：（1）稀疏性：&amp;ldquo;students opened their w&amp;quot;如果从没有出现过，则分子为0，可以先添加微小的扰动避免。&amp;ldquo;students opened their&amp;quot;如果从没有出现过，则分母为0，可以使用倒退法，分母替换为计算&amp;quot;opened their&amp;rdquo;。显然n越大稀疏性越严重，一般n不能大于5（2）存储问题：需要存储语料中所有的n-grams，如存储所有的短语&amp;quot;students opened their books&amp;quot;的次数。（3）没有考虑更长的上下文来预测下文，生成的文本通常没有意义。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;A fixed-window neural language model：通过构建神经网络，输入窗口大小的单词（经过线性层，激活层），预测下个单词。优点：解决了稀疏性和存储问题。缺点：（1）窗口大小依然受限制，没有考虑更长的上下文。（2）和word2vec一样，&lt;strong&gt;完全忽略了词序&lt;/strong&gt;（输入的单词即便交换位置，编码不变），导致建模效果不佳&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;现代语言模型&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;RNN&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;核心思路：重复使用相同的权重矩阵&lt;/li&gt;
+&lt;/ul&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;优势：（1）可以处理任意长度的输入（2）第 t 步的计算可以（理论上）使用来自许多步骤之前的信息（3）模型大小不会因为更长的输入而增加（4）每个时间步都应用相同的权重，因此在处理输入时存在对称性。缺点：（1）递归计算速度较慢（2）在实践中，难以获取来自许多步骤之前的信息&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;训练RNN
+$$
+目标函数\
+one&lt;del&gt;step:J^t(\theta)=CE(y_t,\hat y_t)=-log\hat y_{x_{t+1}}\
+one&lt;/del&gt;sentence:J=-\sum_{t=1}^Tlog\hat y_{x_{t+1}},T&lt;del&gt;is&lt;/del&gt;sentence~length
+$$
+注意事项：（1）训练时是&lt;strong&gt;教师强迫&lt;/strong&gt;，即每次输入都是真值。推理时是&lt;strong&gt;学生&lt;/strong&gt;，即每次输入是上一个时间步的输出。（2）不会使用整段文档输入，因为全部语料过长，计算梯度过于昂贵。考虑先切分成句子（采样具体策略可&lt;a class=&#34;link&#34; href=&#34;https://zh.d2l.ai/chapter_recurrent-neural-networks/language-models-and-dataset.html#id5&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;参考&lt;/a&gt;，随机采样和顺序采样）。每次计算一批（batch/small chunk of data）的梯度并更新参数（SGD）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;RNN的梯度：通过时间的反向传播，即在时间步上进行反向传播。计算速度缓慢同时容易梯度爆炸，可以考虑&lt;strong&gt;时间截断&lt;/strong&gt;，这样做导致该模型主要侧重于短期影响，而不是长期影响。具体参考&lt;a class=&#34;link&#34; href=&#34;https://zh.d2l.ai/chapter_recurrent-neural-networks/bptt.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;文章&lt;/a&gt;
+$$
+\frac{\partial J^t}{\partial W_h}=\sum_{i=1}^t \frac{\partial J^t}{\partial W_h}
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;语言模型评估标准：困惑度。越小的困惑度，表示模型的预测更加准确和自信。
+$$
+Perplexity=exp(-\frac{1}{n}\sum_{t=1}^n log&lt;del&gt;p(x_{t}|x_{t-1},\cdots,x_1) ),in&lt;/del&gt;a~sentence
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;梯度消失/梯度爆炸&lt;/strong&gt;：当这些梯度较小时，梯度信号随着进一步反向传播而变得越来越小。远处的梯度信号会因为比起近处的梯度信号要小得多而丢失。 因此，&lt;strong&gt;模型权重只会针对近处的影响进行更新，而不是长期影响&lt;/strong&gt;。梯度爆炸也是同理，参考&lt;a class=&#34;link&#34; href=&#34;https://karpathy.medium.com/yes-you-should-understand-backprop-e2f06eab496b&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;。后果：网络参数中可能出现INF（数值溢出）或者NAN（计算中出现除以0或者零乘以无穷大）解决方法：（1）梯度裁剪：限制梯度的大小，防止梯度爆炸（2）更换激活函数sigmoid为tanh、relu等（3）使用更好的机制：LSTM、GRU、引入注意力机制、残差连接（Resnet，相对较好的解决办法）等（4）更好的初始化，如：xavier（5）调整学习率等
+$$
+\frac{\partial J^t}{\partial h_0}=\frac{\partial h_1}{\partial h_0}\cdot \frac{\partial h_2}{\partial h_1}\cdots \frac{\partial J^t}{\partial h_t}\
+=\frac{\partial J^t}{\partial h_t}\cdot \prod [ diag(\sigma&amp;rsquo;(W_h\cdot h_{t-1}+W_x\cdot x))\cdot W_h]\=\frac{\partial J^t}{\partial h_t}\cdot  W_h^t\cdot \prod diag(\sigma&amp;rsquo;(W_h\cdot h_{t-1}+W_x\cdot x))\
+因为\sigma&amp;rsquo;(z)=\sigma(z)\cdot (1-\sigma(z)),当z过大或过小都会使得趋近于0;同时W_h过小或者过大会梯度消失或者爆炸
+\
+\
+梯度裁剪主要是为了防止梯度爆炸
+gradient&lt;del&gt;clip:\
+if&lt;/del&gt;||g||≥threshold~then\
+g\leftarrow \frac{threshold}{||g||}\cdot g
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;RNN应用场景：情感分析、文本生成、机器翻译等&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;LSTM&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;核心组件：hidden state与cell state（Both are vectors length n；The cell stores long-term information；The LSTM can read, erase, and write information from the cell）；由以下三个门控制：遗忘门（擦除旧信息，earse）、输入门（添加新的信息，write）、输出门（决定输出哪些东西，read），The gates are also vectors of length n；&lt;strong&gt;The gates are dynamic&lt;/strong&gt;: their value is computed based on the current context
+$$
+每一个门都是向量,使用\sigma 将值映射到0-1之间,后续使用Hardmard积决定哪些信息保留哪些丢弃\
+forget&lt;del&gt;gate:f^t=\sigma(W_f\cdot h^{t-1}+U_f\cdot x^t+b_f):控制从old&lt;/del&gt;cell&lt;del&gt;state中保留或遗忘的内容\
+input&lt;/del&gt;gate:i^t=\sigma(W_i\cdot h^{t-1}+U_i\cdot x^t+b_i):控制new&lt;del&gt;cell&lt;/del&gt;state内容的哪些部分被写入细胞\
+output&lt;del&gt;gate:o^t=\sigma(W_o\cdot h^{t-1}+U_o\cdot x^t+b_o):控制cell&lt;/del&gt;state的哪些部分输出到隐藏状态\
+new&lt;del&gt;cell&lt;/del&gt;content:\widetilde c^t=tanh(W_c\cdot h^{t-1}+U_c\cdot x^t+b_c):准备写入的新内容\
+cell&lt;del&gt;state:c^t=f^t \circ c^{t-1}+i^t\circ \widetilde c^t(\circ &lt;del&gt;is&lt;/del&gt;Hardmard&lt;/del&gt;product):擦除旧信息和写入新信息\
+hidden&lt;del&gt;state:h^t=o^t\circ tanh(c^t):从cell&lt;/del&gt;state读哪些信息
+$$
+&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;lstm的激活函数中，&lt;strong&gt;使用sigmoid和tanh的原因&lt;/strong&gt;：（1）门控使用sigmoid为了映射至0-1之间。（2）tanh主要用在计算隐变量和新内容。为了缓解梯度消失/爆炸，采用(-1,1)之间的tanh，能避免sigmoid的问题。同时这与大多数场景下特征分布是0中心的吻合。此外，tanh函数在输入为0近相比 Sigmoid函数有更大的梯度，通常使模型收敛更快。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;lstm可以保存更长的时间步信息，比如：当某个位置的遗忘门为1，输入门为0，将一直保存该位置信息。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;梯度消失/爆炸不仅仅是RNN的问题，包括前馈和卷积神经网络，特别是非常深层的网络。由于链式法则/非线性函数的选择，梯度在反向传播时可能会变得非常小。因此，较低层的学习速度非常缓慢（即，很难训练）。另一个解决方案：许多新的深度前馈/卷积架构添加了更多的直接连接（从而允许梯度流动），如ResNet，HighwayNet。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ResNet要解决的是深度神经网络的“退化”问题，&lt;strong&gt;“退化”指的是，给网络叠加更多的层后，性能却快速下降的情况&lt;/strong&gt;（包括但不限于由于很深出现梯度消失、爆炸）。ResNet能保证当后面的网络层没有帮助甚至倒退能至少保证之前的性能。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;LSTM&lt;strong&gt;缓解&lt;/strong&gt;梯度消失，具体参考&lt;a class=&#34;link&#34; href=&#34;https://zhuanlan.zhihu.com/p/109519044&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;专栏&lt;/a&gt;：根据公式，f&lt;!-- raw HTML omitted --&gt;t&lt;!-- raw HTML omitted --&gt;根据需要可以时而大时而小，从而保证连乘时每一项可以随时改变，0&lt;del&gt;1之间或者大于。而**普通RNN在连乘时，每一项一直都是在0&lt;/del&gt;1之间（梯度消失）或者大于1（梯度爆炸）**LSTM中cell状态的加法更新策略使得梯度传递更恰当；门控单元可以决定遗忘多少梯度，他们可以在不同的时刻取不同的值。
+$$
+\frac{\partial c_t}{\partial c_{t-1}}=\frac{\partial c_t}{\partial f_t}\cdot \frac{\partial f_t}{\partial h_{t-1}}\cdot \frac{\partial h_{t-1}}{\partial c_{t-1}}+\frac{\partial c_t}{\partial i_t}\cdot \frac{\partial i_t}{\partial h_{t-1}}\cdot \frac{\partial h_{t-1}}{\partial c_{t-1}}+\frac{\partial c_t}{\partial \widetilde c_t}\cdot \frac{\partial \widetilde c_t}{\partial h_{t-1}}\cdot \frac{\partial h_{t-1}}{\partial c_{t-1}}+\frac{\partial c_t}{\partial c_{t-1}}\=c_{t-1} \sigma&amp;rsquo;(\cdot)W_f\cdot o_{t-1}tanh(c_{t-1})+\widetilde c_t \sigma&amp;rsquo;(\cdot)W_i\cdot o_{t-1}tanh(c_{t-1})+i_ttanh&amp;rsquo;(\cdot)W_c\cdot o_{t-1}tanh(c_{t-1})+f_t
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;GRU&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;双向RNN：只适用有权访问整个序列的情况。不适用于语言建模，因为语言建模需要预测下一个词。但比单向RNN能更好利用上下文&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;多层RNN：每一个时间步由多层隐变量堆叠，或者为有多个RNN计算特征。较低的 RNNs 应该计算较低级别的特征，而较高的 RNNs 应该计算较高级别的特&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;seq2seq&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;应用：NMT（神经机器翻译）、文本摘要、对话系统&lt;/li&gt;
+&lt;li&gt;架构：encoder、decoder&lt;/li&gt;
+&lt;li&gt;解码方式：贪婪解码（每次取概率最大的，只是本地最佳且无法后退，可能不是全局最佳。生成停止&lt;!-- raw HTML omitted --&gt;符号就停止生成）、穷举搜索解码（不现实）、束搜素（跟踪k个分支，第t步就会有t&lt;!-- raw HTML omitted --&gt;k-1&lt;!-- raw HTML omitted --&gt;被跟踪，是一个指数级的树结构。当其中一条路径生成停止符号时，继续探索其他路径，完成的路径放在一边。选择得分最好的路径时，需除以单词数。不然根据公式越长的句子得分越低）&lt;/li&gt;
+&lt;li&gt;NMT的优势与缺点&lt;/li&gt;
+&lt;li&gt;评估机器翻译质量：BLEU（计算真值与预测值的相似度）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;attention&#34;&gt;Attention
+&lt;/h2&gt;&lt;p&gt;Seq2Seq+cross-attention&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;背景：Seq2Seq架构使用encoder将源句子信息压缩成一个隐变量，再将隐变量送入到decoder&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;问题：（1）仅用一个隐变量包含源句子的信息，存在信息瓶颈（Information bottleneck，fix：可通过平均每一个时间步的隐状态来概括整个句子的信息）（2）存在远距离交互问题：难以学习长距离依赖关系（因为梯度问题！即便是LSTM也不能完美解决）、只能以线性顺序地观察源句（虽然可以扩展为双向，但是依旧不够灵活）（3）缺乏并行化：未来的RNN隐状态无法在之前被计算&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Seq2Seq with Attention：想法：解决并行化（不可并行化操作的数量不随序列长度增加而增加）、信息瓶颈和最大交互距离（最大交互距离：O(1)，因为所有单词在每一层都会相互作用）；核心思想：在解码器的每一步中，利用与编码器的直接连接来专注于源序列的特定部分。&lt;strong&gt;注意力将每个单词的表征视为一个query，以访问并合并一组value的信息(以权重的方式合并，非常灵活)&lt;/strong&gt;。具体步骤：&lt;strong&gt;decoder的每一时间步作为query，encoder的每一时间步都有一对自己的&amp;lt;key,value&amp;gt;。只不过此时的q,k,v均为对应的隐变量&lt;/strong&gt;。query会与每一个key做内积，然后通过softmax得到此query在encoder每一个时间步的权重分数（总和为1）。最后，对每个value做加权平均，公式如下
+$$
+encoder&lt;del&gt;hidden&lt;/del&gt;states:h_1,\cdots,h_N\in R^h\
+On&lt;del&gt;timestep&lt;/del&gt;t,&lt;del&gt;decoder&lt;/del&gt;hidden&lt;del&gt;state:s_t\in R^h\
+the&lt;/del&gt;attention&lt;del&gt;scores&lt;/del&gt;for&lt;del&gt;this&lt;/del&gt;step:e_t=[s_t^Th_1,\cdots,s_t^Th_N]\
+the&lt;del&gt;attention&lt;/del&gt;distribution&lt;del&gt;for&lt;/del&gt;this&lt;del&gt;step:\alpha_t=softmax(e_t)\
+a&lt;/del&gt;weighted&lt;del&gt;sum&lt;/del&gt;of&lt;del&gt;the&lt;/del&gt;encoder&lt;del&gt;hidden&lt;/del&gt;states&lt;del&gt;to&lt;/del&gt;get&lt;del&gt;the&lt;/del&gt;attention&lt;del&gt;output:o_t=\sum_{i=1}^N \alpha_t^ih_i\
+concatenate&lt;/del&gt;the&lt;del&gt;attention&lt;/del&gt;output&lt;del&gt;with&lt;/del&gt;the&lt;del&gt;decoder&lt;/del&gt;hidden&lt;del&gt;state&lt;/del&gt;to&lt;del&gt;predict&lt;/del&gt;next~token:\hat y=MLP([o_t;s_t])
+$$
+&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;优势：（1）提高了神经机器翻译的性能：允许解码器专注于源语言的某些部分（2）注意力提供了更“人类化”的机器翻译过程模型：在翻译时可以回顾源语句，而不必记住全部内容（3） 注意力解决了瓶颈问题：注意力使解码器能够直接查看源语言; 绕过瓶颈（4）注意力有助于解决梯度消失问题：提供了到远距离状态的捷径（5）提高了可解释性：通过检查注意力分数的分布，我们可以看到解码器正在关注什么。打印分布图，可视化注意力分数&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;注意力分数(attention score)的变种。&lt;strong&gt;注意加性注意力和缩放点积注意力的区别&lt;/strong&gt;。
+$$
+Basic&lt;del&gt;dot&lt;/del&gt;product&lt;del&gt;attention:e_i=s^Th_i,dim(s)==dim(h_i)\
+Multiplicative&lt;/del&gt;attention:e_i=s^TWh_i,dim(s)≠dim(h_i),W\in R^{dim(s)×dim(h_i)}\
+Reduced&lt;del&gt;rank&lt;/del&gt;multiplicative&lt;del&gt;attention:e_i=s^T(U^TV)h_i,U\in R^{dim(s)×k},V\in R^{k×dim(h_i)},k&amp;laquo;dim(s),dim(h_i)\
+Additive&lt;/del&gt;attention:e_i=v^Ttanh(W_1h_i+W_2s),v&lt;del&gt;is&lt;/del&gt;a&lt;del&gt;weight&lt;/del&gt;vector\bf(可以看作将value中有用的信息筛选出来)
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;核心思想：&lt;strong&gt;给定一组&amp;lt;key,value&amp;gt;和query，注意力机制是通过权重分数对value进行加权求和，得到value中包含的信息的选择性摘要，其中查询确定要关注哪些值&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;self-attention/Transformer&lt;/p&gt;
+&lt;p&gt;参考资源：https://jalammar.github.io/illustrated-transformer/&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;背景：是否&lt;strong&gt;encoder部分也能去除RNN&lt;/strong&gt;，直接全部替换为注意力。（1）对源句逐步建模，不符合人工翻译的步骤，应该可随时查看且能双向查看（2）逐步建模源句，不能很好的利用GPU并行&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;attention in encoder&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;具体内容：输入的每一个句子的每一个token（经过Embedding后的词嵌入），都会同时被Q，K，V权重矩阵分别编码为&amp;lt;query,key,value&amp;gt;。后续操作同上，公式如下
+$$
+w_{1:n}&lt;del&gt;is&lt;/del&gt;a&lt;del&gt;sequence&lt;/del&gt;of&lt;del&gt;words&lt;/del&gt;in&lt;del&gt;vocabulary&lt;/del&gt;V\
+x_i=Ew_i,x_i&lt;del&gt;is&lt;/del&gt;word&lt;del&gt;embedding\
+q_i=Qx_i,k_i=Kx_i,v_i=Vx_i\
+e_{ij}=q_i^T\cdot k_j(计算相似性),\alpha_{ij}=\frac{exp(e_{ij})}{\sum exp(e_{i*})}(score)\
+weighted&lt;/del&gt;sum&lt;del&gt;of&lt;/del&gt;values:o_i=\sum_j \alpha_{ij}\cdot v_j
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;问题1：没有顺序的概念，即同一个单词在不同位置上结果是一样的，这不符合语义。解决方案：引入位置向量，基本公式如下
+$$
+position&lt;del&gt;vectors:p_i\in \mathbb{R}^d,i\in{1,2,\cdots,n}\
+word&lt;/del&gt;embedding:x_i\
+positioned~embedding:\hat x_i=x_i+p_i\&lt;/p&gt;
+&lt;p&gt;对于位置pos和维度i,位置编码PE_{(pos, i)}可以由以下公式计算\
+PE_{(pos, i)} = \begin{cases}
+\sin(pos / 10000^{2i/d_{\text{model}}}) &amp;amp; \text{if } i \text{ is even} \
+\cos(pos / 10000^{2i/d_{\text{model}}}) &amp;amp; \text{if } i \text{ is odd}
+\end{cases}
+\
+其中pos是输入序列中的位置,从1开始计数
+i是位置编码向量中的维度
+d_{\text{model}}是Transformer模型的输入和输出向量的维度。
+\
+在这个公式中,10000^{2i/d_{\text{model}}}控制着正弦和余弦函数的周期。
+$$
+位置向量分类：（1）不可学习的，即根据数学公式决定的，如&lt;strong&gt;正弦位置表示&lt;/strong&gt;（优势：周期性表明“绝对位置”可能并不那么重要，比如当i足够大时、可能可以对更长的序列进行外推，因为周期重新开始）（2）可学习的，即把位置向量作为可学习的参数。优势：更加灵活，这也是目前系统用的最多的（课堂提问：怎么知道所学的就是位置信息。回答：其实也没有其他信息能代表了。词向量会因为输入的句子变化而变化，而位置向量一直不变）。缺点：无法对超出1~n的句子外推。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;问题2：没有非线性，一切都只是加权平均。解决方案：每一个位置的输出（即每一个token的加权平均求和的value输出），套上非线性层和前馈层（FFN/MLP）。实验表明：&lt;strong&gt;增大前馈子层隐状态的维度有利于提升最终翻译结果的质量，因此，前馈子层隐状态的维度一般比自注意力子层要大。FFN的参数占整个Transformer的三分之二，研究表明FFN层存储了Transformer的知识&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;$$
+FFN(x) = Relu(xW_1 + b_1)W_2 + b_2
+$$
+&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;问题3：需要有语言建模的特点，即不能看到未来的单词，只能看到过去的单词。解决方案：mask在之后的单词，即赋值为负无穷，可使得点积后的注意力权重为0，实现了不看未来同时也保证了并行化。&lt;strong&gt;Mask的本质是控制信息流动&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Stacked form of Attention：直接计算出整个seq中的注意力加权平均值，特点：自注意力的注意力分数维度为n×n（可以理解为每一个token对其他token包括自己的注意力分数）、&lt;strong&gt;输出的维度和输入的维度一样&lt;/strong&gt;
+$$
+input&lt;del&gt;words&lt;/del&gt;vectors:X=[x_1,x_2,\cdots,x_n]\in\mathbb{R}^{n×d}\
+Q,K,V\in\mathbb{R}^{d×k};XQ,XK,XV\in\mathbb{R}^{n×k}\
+output = softmax(XQ\cdot(XK)^T)\cdot XV \in \mathbb{R}^{n×d}\
+$$
+图示，参考&lt;a class=&#34;link&#34; href=&#34;https://jalammar.github.io/illustrated-transformer/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;，如下&lt;/p&gt;
+&lt;p&gt;（1）计算query，key，value；X矩阵的每一行代表一个单词，维度为n×d，这里以2个单词4维为例。论文中词嵌入维度为64，权重矩阵维度为64×512&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;p&gt;（2）计算加权平均值&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;多头注意力：希望从不同角度来查看句子（类似于MOE）。具体内容：将d维划分为h个头，维度降为d/h，头数为h。计算h组（每一个头单独计算注意力分数；总的计算效率和单头一样）最后将每组的value连接在一起，需乘上权重映射到才能和FFN（与输入时的token维度一致，单头的维度只有n×d/k）匹配，或者说&lt;strong&gt;乘上权重矩阵是为了学习如何提取多头值的信息&lt;/strong&gt;。课堂提问：压缩维度后对精度没有影响吗；回答：在实际操作中没有影响&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;p&gt;代码验证&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 以下验证XQ,XK,XV的维度&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 4单词 6维度 n×d&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;rand(&lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;,&lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt;) 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tensor([[&lt;span style=&#34;color:#ae81ff&#34;&gt;0.1725&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.3749&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.9455&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.0374&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.4991&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.7726&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.4857&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1395&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1681&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.6111&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.2824&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.9753&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.2526&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.5623&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.7512&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.8236&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.4917&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.4934&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.0304&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.6789&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.4181&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.0152&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1853&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.9303&lt;/span&gt;]])
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 4单词 2头 维度降低至3维度 n×k×d/k&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 现在维度的含义是每个单词有两个头维度是3,我们需要把每一组联合起来&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;z &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; y&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;reshape(&lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;,&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;,&lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tensor([[[&lt;span style=&#34;color:#ae81ff&#34;&gt;0.1725&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.3749&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.9455&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.0374&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.4991&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.7726&lt;/span&gt;]],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        [[&lt;span style=&#34;color:#ae81ff&#34;&gt;0.4857&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1395&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1681&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.6111&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.2824&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.9753&lt;/span&gt;]],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        [[&lt;span style=&#34;color:#ae81ff&#34;&gt;0.2526&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.5623&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.7512&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.8236&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.4917&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.4934&lt;/span&gt;]],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        [[&lt;span style=&#34;color:#ae81ff&#34;&gt;0.0304&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.6789&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.4181&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.0152&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1853&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.9303&lt;/span&gt;]]])
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 联合起来 2头 每头 4单词维度降低至3维度 k×n×d/k 类似于带有的batch的维度&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;z&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;transpose(&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tensor([[[&lt;span style=&#34;color:#ae81ff&#34;&gt;0.1725&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.3749&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.9455&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.4857&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1395&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1681&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.2526&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.5623&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.7512&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.0304&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.6789&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.4181&lt;/span&gt;]],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        [[&lt;span style=&#34;color:#ae81ff&#34;&gt;0.0374&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.4991&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.7726&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.6111&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.2824&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.9753&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.8236&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.4917&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.4934&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.0152&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1853&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.9303&lt;/span&gt;]]])
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 和直接转换为(2,4,3)不一样&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tensor([[[&lt;span style=&#34;color:#ae81ff&#34;&gt;0.1725&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.3749&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.9455&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.0374&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.4991&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.7726&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.4857&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1395&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1681&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.6111&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.2824&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.9753&lt;/span&gt;]],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        [[&lt;span style=&#34;color:#ae81ff&#34;&gt;0.2526&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.5623&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.7512&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.8236&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.4917&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.4934&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.0304&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.6789&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.4181&lt;/span&gt;],
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         [&lt;span style=&#34;color:#ae81ff&#34;&gt;0.0152&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1853&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.9303&lt;/span&gt;]]])
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Scaled Dot Product&lt;/strong&gt;（&lt;strong&gt;训练时使用&lt;/strong&gt;）：（1）当对向量的维度d进行点积时，即使是随机向量，点积大小会随着根号d的增大而增大。通过根号d来对点积进行归一化，以阻止这种缩放。（2）缩放点积模型能防止点积结果过大导致 softmax 梯度过小，反向传播困难的情况，保证训练时的稳定性。
+$$
+y=\frac{e^x}{\sum_{i=1}^n e^i}\
+\frac {\partial y}{\partial x}=\frac{e^x\sum_{i=1且i≠x}^n e^i}{(\sum_{i=1}^n e^i)^2}=\frac{e^x\sum_{i=1且i≠x}^n e^i}{(e^x+\sum_{i=1且i≠x}^n e^i)^2}\
+若e^x过大,导致其梯度过小
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Residual connections&lt;/strong&gt;：防止退化，避免因为网络过深而梯度消失。和层归一化都属于optimization trick&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Layer normalization&lt;/strong&gt;：主要的思想是对&lt;strong&gt;每个样本的每个特征进行标准化&lt;/strong&gt;，具体来说，对于一个层的输入，每个样本的每个特征都被标准化，使得其均值为0，标准差为1（将数据分布控制在均值为0，方差为1，避免过大或者过小，方差理解为数据的紧凑程度。可以理解为&lt;strong&gt;分布稳定下来，安心学习&lt;/strong&gt;）层归一化技术可以有效地缓解优化过程中潜在的不稳定、收敛速度慢等问题。而Batch norm是对每个特征的所有样本进行标准化，具体区别可参考&lt;a class=&#34;link&#34; href=&#34;https://developer.aliyun.com/article/902038&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;
+$$
+for&lt;del&gt;an&lt;/del&gt;individual&lt;del&gt;vector(word):x=[x_1,x_2,\cdots,x_{dn}]\
+compute&lt;/del&gt;\mu(均值)=\frac{1}{dn} \sum_{i=1}^{dn}x_i
+&lt;del&gt;and&lt;/del&gt;\sigma(标准差)= \sqrt{\frac{1}{dn} \sum_{i=1}^{dn}(x_i - \mu)^2}
+\
+\hat x=\frac{x-\mu}{\sigma+\epsilon},\epsilon 是一个很小的扰动 防止除数为0\
+LayerNorm=\gamma\hat x +\beta,\gamma和\beta是可学习参数,用于缩放和平移标准化后的特征\\
+h_{pre-norm} = f(LN(h)) + h,即先做LN,再将其输入至Attn或FFN,再和之前的隐变量相加\
+h_{post-norm} = LN(f(h) + h),即先过Attn或FFn,再和之前的隐变量相加,最后做LN\
+事实证明,前标准化的梯度在初始化时要好得多,从而导致训练速度更快
+$$
+完整的一块encoder，&lt;strong&gt;为什么一块encoder里会有两层add&amp;amp;norm&lt;/strong&gt;。实际代码是前归一化，即先层归一化，再残差连接&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;attention in decoder（训练/推理具体细节）&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;相同之处：基础架构为多头注意力，与encoder使用相同的位置向量和词向量；不同之处：新增组件：encoder部分做key和value、Mask&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;encoder与decoder的连接：cross-attention类似于RNN+attention。
+$$
+output&lt;del&gt;vectors&lt;/del&gt;from&lt;del&gt;encoder:h_1,h_2,\cdots,h_n\
+input&lt;/del&gt;vectors&lt;del&gt;from&lt;/del&gt;decoder:z_1,z_2,\cdots,z_n\
+类似于从源句中提取信息(RNN+Attention):k_i=Kh_i,v_i=Vh_i,q_i=Qz_i
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Mask：将权重分数赋值为负无穷，以实现信息不流通。思路：在每个时间步，我们可以改变key和query的集合，只包括过去的单词（效率低下）为了保证并行率，通过设置注意力分数为－∞来屏蔽对未来单词的注意力。
+$$
+e_{ij}=\begin{cases}
+q_i^Tk_j&amp;amp;i\geq j \
+-\infty&amp;amp;i&amp;lt;j\
+\end{cases}
+$$
+&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;训练：直接将源和目标全部给出（教师强迫），能利用到矩阵的并行计算，这就是比起RNN最大的改进&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 参考代码链接http://nlp.seas.harvard.edu/&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;EncoderDecoder&lt;/span&gt;(nn&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Module):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; __init__(self, encoder, decoder, src_embed, tgt_embed, generator):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        super(EncoderDecoder, self)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;__init__()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;encoder &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; encoder
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;decoder &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; decoder
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;src_embed &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; src_embed
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;tgt_embed &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; tgt_embed
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;generator &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; generator
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;forward&lt;/span&gt;(self, src, tgt, src_mask, tgt_mask):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;decode(self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;encode(src, src_mask), src_mask,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                            tgt, tgt_mask)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;encode&lt;/span&gt;(self, src, src_mask):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;encoder(self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;src_embed(src), src_mask)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;decode&lt;/span&gt;(self, memory, src_mask, tgt, tgt_mask):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;decoder(self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;tgt_embed(tgt), memory, src_mask, tgt_mask)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;SimpleLossCompute&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; __init__(self, generator, criterion, opt&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;None&lt;/span&gt;):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;generator &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; generator
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;criterion &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; criterion
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;opt &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; opt
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; __call__(self, x, y, norm):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;generator(x) &lt;span style=&#34;color:#75715e&#34;&gt;# [bs,seq,V_size]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        loss &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;criterion(x&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;contiguous()&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;view(&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, x&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;size(&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)), &lt;span style=&#34;color:#75715e&#34;&gt;# [bs*seq,V_size]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                              y&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;contiguous()&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;view(&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)) &lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt; norm &lt;span style=&#34;color:#75715e&#34;&gt;# bs*seq 如[2,3,0]类似于独热编码作用 使用likehood 作为目标函数&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        loss&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;backward()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;opt &lt;span style=&#34;color:#f92672&#34;&gt;is&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;not&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;None&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;opt&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;step()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;opt&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;optimizer&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;zero_grad()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; loss&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;data[&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;] &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; norm
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;run_epoch&lt;/span&gt;(data_iter, model, loss_compute):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; i, batch &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; enumerate(data_iter):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        out &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; model&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;forward(batch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;src, batch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;trg, batch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;src_mask, batch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;trg_mask) &lt;span style=&#34;color:#75715e&#34;&gt;#[bs,seq,dim] &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        loss &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; loss_compute(out, batch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;trg_y, batch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;ntokens)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       	&lt;span style=&#34;color:#f92672&#34;&gt;.....&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;....&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;训练时目标函数
+$$
+L=-\sum^T_{t=1}log&lt;del&gt;P(y_t|y_{&amp;lt;t})\
+这里训练时不需要解码&lt;/del&gt;只需计算出每个token的概率分布即可
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;预测：每次输出对下一个单词的预测，会采取解码方式如：贪心，束搜索&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;greedy_decode&lt;/span&gt;(model, src, src_mask, max_len, start_symbol):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    memory &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; model&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;encode(src, src_mask)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    ys &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;ones(&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;fill_(start_symbol)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;type_as(src&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;data)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; i &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; range(max_len&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        out &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; model&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;decode(memory, src_mask, 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                           Variable(ys), 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                           Variable(subsequent_mask(ys&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;size(&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                                    &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;type_as(src&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;data)))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        prob &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; model&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;generator(out[:, &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;]) &lt;span style=&#34;color:#75715e&#34;&gt;# 预测时采用最后一个token的表征来预测下一个token&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        _, next_word &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;max(prob, dim &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        next_word &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; next_word&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;data[&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        ys &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;cat([ys,torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;ones(&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;type_as(src&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;data)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;fill_(next_word)], dim&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; ys
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;model overview，参考&lt;a class=&#34;link&#34; href=&#34;https://jalammar.github.io/illustrated-transformer/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;（1）每一个encoder和decoder不共享权重&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;p&gt;（2）以2encoder，2decoder为例。流程：（1）输入源句至编码器输出后得到e_output（2）&lt;!-- raw HTML omitted --&gt;输入编码器，得到下一个token（3）拼接token继续输入，重复以上操作，直到输出&lt;!-- raw HTML omitted --&gt;。训练时将使用真实值拼接，测试时使用上一步预测的结果拼接&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;ul&gt;
+&lt;li&gt;Transformer缺点和问题：（1）二次计算：自注意力的时间复杂度（矩阵乘法复杂度O(N&lt;!-- raw HTML omitted --&gt;2&lt;!-- raw HTML omitted --&gt;d)），计算随着序列长度呈二次增长。而对于RNN，计算仅呈线性增长，某种程度上是一种倒退。fix：Linformer将序列长度维度映射到一个较低维度的空间，用于值和键。然而实际并没有太多工作能够显著提高效率的（2）位置编码：使用简单的绝对索引来表示位置是我们能做的最好的吗？考虑相对位置或者依赖于语法的位置&lt;/li&gt;
+&lt;li&gt;注意力变种：&lt;strong&gt;注意力mask的本质是控制信息流动&lt;/strong&gt;，考虑到原始注意力在时间效率上的，参考稀疏注意力等优化方式https://zhuanlan.zhihu.com/p/527688857、https://web.stanford.edu/class/archive/cs/cs224n/cs224n.1194/reports/default/15837192.pdf&lt;/li&gt;
+&lt;li&gt;位置编码变种：RoPE、ReRoPE&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;pre-training&#34;&gt;Pre-training
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;思想：使用大规模数据进行自监督学习&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;分词&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;背景：目前的词典操作，如果遇到未知的词统一映射到一个特殊词元&lt;!-- raw HTML omitted --&gt;，这会丢失很多信息。同时一个词有很多形态，但是意义几乎一样，不可能每一种形态都为其单独建立一个词嵌入。&lt;/li&gt;
+&lt;li&gt;解决：subword 分词&lt;/li&gt;
+&lt;li&gt;分词常用方法，参见&lt;a class=&#34;link&#34; href=&#34;https://cloud.tencent.com/developer/article/1865689&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;，https://github.com/google/sentencepiece
+&lt;ul&gt;
+&lt;li&gt;BPE&lt;/li&gt;
+&lt;li&gt;Wordpiece&lt;/li&gt;
+&lt;li&gt;SentencePiece&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;预训练的动机：来源于word2vec的失败（一个单词通常有多个意思，而word2vec把它们压缩成一个词向量），然而一个单词的意义需要在具体的上下文中体现。课堂提问：在word2vec阶段，可能不需要标点。但是现在在实践中需要标点，尽可能保持和人类接收到的一致。预训练结构：基于Bi-LSTM或者Transformer。&lt;strong&gt;预训练方法：隐藏了输入的一部分从模型中提取特征，并对模型进行训练，以重建这些部分&lt;/strong&gt;。预训练的好处：（1）下游任务可以标注少量数据（2）根据上下文表征了语言信息（3）更好的参数初始化，而不是从头开始训练（4）可用于生成语言的概率分布&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;能从重建语句中学到什么（学习完形填空）：事实知识、语法知识、实体指代信息、分类信息、情感分析、推理能力等&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;从语言建模训练：语言建模的本质是根据前面的句子预测下一个单词。可以使用教师强迫的方法训练预训练模型去预测下一个单词。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;预训练的训练数据源：BookCorpus、English Wikipedia、WebText&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;预训练的三种架构&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Encoders-only&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;特点：双向学习，可以以未来为条件。&lt;strong&gt;不能语言建模&lt;/strong&gt;，即在NLG很弱。考虑如何提升其语言强表征能力&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;训练的目标优化函数：替换掉里面部分单词使用特殊的[MASK]标记进行输入，预测出这些单词。感觉和扩散模型的思路有异曲同工之妙：&lt;strong&gt;用残缺/噪声的数据还原成原始的数据&lt;/strong&gt;
+$$
+x是源句,\hat x是被掩盖后的句子\
+目标函数:p_{\theta}(x|\hat x)
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;BERT为例，Masked LM细节：随机预测15%的subwords：（1）其中的80%用[Mask]代替（2）其中10%用其他子词代替（3）剩余10%不变，保证当模型遇到完整的句子时也能很好的表征。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;BERT的其他细节：（1）还加入了预测是否B句子是A句子的延续。但事实证明这并不是特别有效，当时人们希望他能学到长距离的概念（2）怎么就将隐藏变量就映射到了模型想要预测的单词，回答：可能是最后有一层转换到词表空间的线性层&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;BERT变种：RoBERTa：移除对下一句子的预测，使输入的句子更长、SpanBERT：Mask连续的几个词，增加任务难度&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Finetune vs &lt;strong&gt;PEFT&lt;/strong&gt;，参考2023版PPT：背景：应用预训练模型在下游任务中时需要进行微调。理论上说，全参数微调可能效果更好，但消耗内存较多。PEFT会以受限的方式调整预训练模型，这样可以减少过拟合或者实现更高效的微调和推断。PEFT，各种方法详细介绍参考&lt;a class=&#34;link&#34; href=&#34;https://www.zhihu.com/question/593383416/answer/2982770383&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;：（1）Adapter Tuning：在前馈层前加入Adapter层，每一个Adapter层都会作降维再升为的操作，同时也引入了skip-connect。缺点是会引入额外的参数（1）prefix-tuning：在输入的句子前添加前缀参数，可像处理真实单词一样处理前缀，可以理解为是token但是能训练。好处：可以根据需要选择不同的前缀标记，以适应不同的任务和领域（3）LoRA：加入低秩矩阵。目前较新的PEFT方式：&lt;strong&gt;Qlora、Dora&lt;/strong&gt;等&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Encoder-Decoders&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;特点：能进行语言建模，编码层对输入的句子进行理解，解码层进行语言建模&lt;/li&gt;
+&lt;li&gt;代表模型：T5（掩盖源句的部分token，预测出被掩盖的token）、BART&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;T5中的训练目标&lt;/strong&gt;：掩盖掉源句的子词，生成被掩盖的词。T5能很好的进行知识问答&lt;/li&gt;
+&lt;li&gt;感觉是比较好的策略，但是&lt;strong&gt;为什么许多大模型没有这样用&lt;/strong&gt;。背景：encoder-only虽然在NLU很强但在NLG方面不行，目前只比较encoder-decoder和decoder-only。原因：（1）enc-dec可能会进一步增加参数量，效率也会较低，即使enc-dec上限可能会更高（2）从效果上，&lt;strong&gt;decoder-only的zero-shot能力更强&lt;/strong&gt;，这一点非常重要（3）生成任务可以兼容理解任务，即decoder-only在NLU方面也比较强（4）预训练和下游任务的统一：万物皆可生成，从生成的角度来看，decoder-only就是最合理的，预训练时看不到下文，下游任务使用时也看不到下文，加个encoder就比较奇怪了，属于是编码时可以泄露下文，而解码时不让看到下文（5）从理论上，&lt;strong&gt;encoder中的自注意力网络存在着低秩问题&lt;/strong&gt;，可能会影响模型的表达能力，而decoder的attention矩阵是个下三角矩阵，是满秩的。&amp;ndash;苏剑林&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Decoders-only&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;特点：很好的语言建模&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;训练目标：参考GPT，进行语言建模式预训练，即在大量文档语料上进行预测下一个token。后续大模型时代提出指令微调（QA）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;GPT系列：GPT（117M ）和GPT2（1.5B）主要是展示生成能力的提升，GPT3（&lt;strong&gt;175B&lt;/strong&gt; ）展示上下文学习、零样本泛化能力&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Scaling Laws&lt;/strong&gt;：参考&lt;a class=&#34;link&#34; href=&#34;https://zhuanlan.zhihu.com/p/631357320&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;：随着模型大小、数据集大小和用于训练的计算浮点数的增加，模型的性能会提高。并且为了获得最佳性能，所有三个因素&lt;strong&gt;必须同时放大&lt;/strong&gt;。当不受其他两个因素的制约时，模型性能与每个单独的因素都有&lt;strong&gt;幂律关系&lt;/strong&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Prefix LM与Casual LM，参考&lt;a class=&#34;link&#34; href=&#34;https://zhuanlan.zhihu.com/p/672257397&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;。Prefix LM：Encoder和Decoder&lt;strong&gt;共享&lt;/strong&gt;了同一个Transformer结构，在Transformer内部通过Attention Mask机制来实现。参考LLM，清华的&lt;a class=&#34;link&#34; href=&#34;https://arxiv.org/pdf/2103.10360.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;GLM&lt;/a&gt;&lt;img src=&#34;C:/Users/wcx/Desktop/%e8%87%aa%e7%84%b6%e8%af%ad%e8%a8%80%e5%a4%84%e7%90%86%e5%9f%ba%e7%a1%80/images/attention/prefixlm.jpg&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;Casual LM为经典的only decoder架构，casual attention mask即经典的掩蔽未来token的操作&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;C:/Users/wcx/Desktop/%e8%87%aa%e7%84%b6%e8%af%ad%e8%a8%80%e5%a4%84%e7%90%86%e5%9f%ba%e7%a1%80/images/attention/casuallm.jpg&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;总结：前缀语言模型可以根据给定的前缀生成后续的文本，而因果语言模型只能根据之前的文本生成后续的文本。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Bert详解，参考http://jalammar.github.io/illustrated-bert/ 源代码：https://github.com/google-research/bert&lt;/p&gt;
+&lt;p&gt;Details about BERT&lt;/p&gt;
+&lt;p&gt;• Two models were released:&lt;/p&gt;
+&lt;p&gt;• BERT-base: 12 layers, 768-dim hidden states, 12 attention heads, 110 million params.&lt;/p&gt;
+&lt;p&gt;• BERT-large: 24 layers, 1024-dim hidden states, 16 attention heads, 340 million params.&lt;/p&gt;
+&lt;p&gt;• Trained on:&lt;/p&gt;
+&lt;p&gt;• BooksCorpus (800 million words)&lt;/p&gt;
+&lt;p&gt;• English Wikipedia (2,500 million words)&lt;/p&gt;
+&lt;p&gt;• Pretraining is expensive and impractical on a single GPU.&lt;/p&gt;
+&lt;p&gt;• BERT was pretrained with 64 TPU chips for a total of 4 days.&lt;/p&gt;
+&lt;p&gt;• (TPUs are special tensor operation acceleration hardware)&lt;/p&gt;
+&lt;p&gt;• Finetuning is practical and common on a single GPU&lt;/p&gt;
+&lt;p&gt;• “Pretrain once, finetune many times.”&lt;/p&gt;
+&lt;p&gt;具体如何分割（策略：采取最少分割次数的分词策略，比如ify可分成if+y，也可单独，如果词表有ify则不拆ify）。&lt;/p&gt;
+&lt;p&gt;Transformer decoder with 12 layers, 117M parameters.&lt;/p&gt;
+&lt;p&gt;• 768-dimensional hidden states, 3072-dimensional feed-forward hidden layers.&lt;/p&gt;
+&lt;p&gt;• Byte-pair encoding with 40,000 merges&lt;/p&gt;
+&lt;p&gt;• Trained on BooksCorpus: over 7000 unique books.&lt;/p&gt;
+&lt;p&gt;• Contains long spans of contiguous text, for learning long-distance dependencies.&lt;/p&gt;
+&lt;p&gt;• The acronym “GPT” never showed up in the original paper; it could stand for&lt;/p&gt;
+&lt;p&gt;“Generative PreTraining” or “Generative Pretrained Transformer&lt;/p&gt;
+&lt;p&gt;预训练模型架构&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;encoder：BERT（maskedLM）:策略：替换、mask、保持不变，来预测应该出现的单词；额外加了一个预测句子B是否是A的延续（但事实证明这并不是特别有效，当时人们希望他能学到长距离的概念）。怎么就将隐藏变量就映射到了模型想要预测的单词（回答：可能是最后有一层转换成词表的线性层）。变种。&lt;/li&gt;
+&lt;li&gt;encoder-decoder：将一段长文本分成两块，由前一段来预测后一段。QA&lt;/li&gt;
+&lt;li&gt;decoder&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;GPT-2的标题显示作者任务language model应该是一个无监督的多任务学习者，即可以显示零样本学习（即给出模型没有见过的样本时，也能很好地处理）&lt;/p&gt;
+&lt;h2 id=&#34;nlg&#34;&gt;NLG
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;NLP自然语言处理=NLU自然语言理解+NLG自然语言生成&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;NLG分类：从开放性角度分类（即生成的文本开放程度、多样性）从close到open：Machine Translation、Summarization、Task-driven Dialog、ChitChat Dialog、Story Generation&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;NLG模型&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;预测next token公式
+$$
+input_seq:[y_0,y_1,\cdots,y_{t-1}]\
+For&lt;del&gt;model&lt;/del&gt;f&lt;del&gt;and&lt;/del&gt;vocab&lt;del&gt;V,we&lt;/del&gt;get&lt;del&gt;scores&lt;/del&gt;S=f({y_{&amp;lt;t}},\theta)\
+P(y_t|{y_{&amp;lt;t}})=\frac{exp(S_w)}{\sum_{w&amp;rsquo;\in Vexp(S_{w&amp;rsquo;})}}\
+\hat y_t=g(P(y_t|{y_{&amp;lt;t}})),g&lt;del&gt;is&lt;/del&gt;decoding~algorithm
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;对于非开放性任务如机器翻译，常用Enc-Dec架构（为了更多的原句的约束）；对于开放性生成任务，常用Dec架构（自回归式，循环拼接预测的token以预测下一个token直到出现结束符）&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;解码：用于推理，训练时加入？？？各种解码策略代码实现参考&lt;a class=&#34;link&#34; href=&#34;https://avoid.overfit.cn/post/42c2631bc56347849d538768d84d47c2&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;解码的公式定义
+$$
+在每个时间步t计算出词汇表中每个token的得分:S=f({y_{&amp;lt;t}})\
+softmax计算词汇表中每个token的概率分布p:P(y_t=w|{y_{&amp;lt;t}})=\frac{exp(S_w)}{\sum_{w&amp;rsquo;\in Vexp(S_{w&amp;rsquo;})}}\
+解码算法定义为从这个分布中选择token的函数g:\hat y_t=g(P(y_t|{y_{&amp;lt;t}}))
+$$&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Greedy Decoding与Beam Search
+$$
+贪婪解码:\hat y_t=argmax(P(y_t|{y_{&amp;lt;t}})),即在概率分布中选择概率最高的词汇
+$$
+参考代码&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;greedy_decode&lt;/span&gt;(model, src, src_mask, max_len, start_symbol):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    memory &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; model&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;encode(src, src_mask)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    ys &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;ones(&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;fill_(start_symbol)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;type_as(src&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;data)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; i &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; range(max_len&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        out &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; model&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;decode(memory, src_mask, 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                           Variable(ys), 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                           Variable(subsequent_mask(ys&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;size(&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                                    &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;type_as(src&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;data)))
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        prob &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; model&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;generator(out[:, &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;]) &lt;span style=&#34;color:#75715e&#34;&gt;# 预测时采用最后一个token的表征来预测下一个token&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        _, next_word &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;max(prob, dim &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        next_word &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; next_word&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;data[&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        ys &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;cat([ys,torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;ones(&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;type_as(src&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;data)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;fill_(next_word)], dim&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; ys
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Beam Search：有更大选择的候选序列&lt;/p&gt;
+&lt;p&gt;参考代码：作业四/作业五&lt;/p&gt;
+&lt;p&gt;总的来说，&lt;strong&gt;基于最大概率解码对于像机器翻译和摘要这样低熵任务是有利的&lt;/strong&gt;！上述二者方法的问题：对于最可能的字符串容易重复。原因：自我放大效应，模型认为重复生成这段token的负似然分数越来越小，即信心越来越大。目前扩大参数规模、数据规模依旧没有解决此问题。解决方案：（1）规则避免重复n-gram（2）使用不同的训练目标函数：Unlikelihood objective惩罚已经生成的标记、Coverage loss防止注意机制关注相同的单词（3）使用不同的解码方法：对比解码。&lt;/p&gt;
+&lt;p&gt;对于开放式生成，找到最可能的字符串是合理的吗？对比了Beam search和真实人类表达时的选择token的概率，发现人类的选择具有随机性。因此，提出了引入随机性的方法，即采样Sampling&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Top-k sampling&lt;/p&gt;
+&lt;p&gt;完全随机采样，即赋予词表中所有token相同的机会，这可能会引入完全不匹配的token。提出只从概率分布中的前k个token中进行采样，保证了合理性和随机性。k为超参数。top-k的问题：一旦设定会固定。有时会 cut off too quickly，即前＞k个token都合理；有时 cut off too slowly，即当仅有＜k个token合理 剩余的token完全不合理。因此引入动态选择top-p&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Top-p sampling：从排名前p的累积概率质量中抽样所有令牌
+$$
+当分布P_t较平坦时,有限的k会消除许多可行选项\
+当分布P_t更尖锐时,较高的k允许太多选项有机会被选中\
+解决方案:top-p~采样\
+从排名前p的累积概率质量中抽样所有令牌（即，质量集中的地方）\
+根据P_t的均匀程度变化k
+$$
+详细流程：（1）softmax后从高到低排序（2）计算前缀和（3）当某个位置的前缀和高于阈值则后面位置的舍弃（4）找到累积概率超过给定阈值p的最小token子集，这个子集就是所谓的“核”（nucleus）参考代码如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 参考代码如下&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;top_p_sampling&lt;/span&gt;(input_ids, max_tokens&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;, top_p&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;0.95&lt;/span&gt;):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;with&lt;/span&gt; torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;inference_mode():
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; _ &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; range(max_tokens):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            outputs &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; model(input_ids)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            next_token_logits &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; outputs&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;logits[:,&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;,:] &lt;span style=&#34;color:#75715e&#34;&gt;# [bs, seq_len, V_size]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            sorted_logits, sorted_indices &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;sort(next_token_logits, descending&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;True&lt;/span&gt;) &lt;span style=&#34;color:#75715e&#34;&gt;# 默认最后一维降序排列&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            sorted_probs &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; F&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;softmax(sorted_logits, dim&lt;span style=&#34;color:#f92672&#34;&gt;=-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            cumulative_probs &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;cumsum(sorted_probs, dim&lt;span style=&#34;color:#f92672&#34;&gt;=-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;) &lt;span style=&#34;color:#75715e&#34;&gt;# 计算前缀和&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            sorted_indices_to_remove&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;cumulative_probs &lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; top_p &lt;span style=&#34;color:#75715e&#34;&gt;# 得到每个位置是否超出阈值 超出阈值说明后面的token不合理 未超过说明目前位置的token合理&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            sorted_indices_to_remove[&lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;] &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;False&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# 暂且不知道什么作用&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            indices_to_remove&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;sorted_indices[sorted_indices_to_remove] &lt;span style=&#34;color:#75715e&#34;&gt;# 获得剔除的token位置&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            next_token_logits&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;scatter_(&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, indices_to_remove[&lt;span style=&#34;color:#66d9ef&#34;&gt;None&lt;/span&gt;, :], float(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;-inf&amp;#39;&lt;/span&gt;)) &lt;span style=&#34;color:#75715e&#34;&gt;# 填充-inf 这样采样的权重为0 将永远不会被采样&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            probs&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;F&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;softmax(next_token_logits, dim&lt;span style=&#34;color:#f92672&#34;&gt;=-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            next_token&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;multinomial(probs, num_samples&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;) &lt;span style=&#34;color:#75715e&#34;&gt;# 按权重采样 概率高的token越容易被采样&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            input_ids&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;cat([input_ids, next_token], dim&lt;span style=&#34;color:#f92672&#34;&gt;=-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        generated_text&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;tokenizer&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;decode(input_ids[&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;])
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; generated_text
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;其他采样策略：Typical Sampling：Reweights the score based on the entropy of the distribution。Epsilon Sampling：Set a threshold for lower bounding valid probabilities。当前比较火热的大模型采样策略，主要是为了减轻幻觉等：Dola、OPERA、Activation decoding、ITI等&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;扩大随机性：温度系数。平缓每个token之间的差异性，需要结合beam search和top-p使用，这样可选择更多的token。&lt;/p&gt;
+&lt;p&gt;来自huggingface 代码中的注释：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;[`LogitsWarper`] for temperature (exponential scaling output probability distribution), which effectively means that it can control the randomness of the predicted tokens. Often used together with [`TopPLogitsWarper`] and [`TopKLogitsWarper`]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;使用方法：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-markdown&#34; data-lang=&#34;markdown&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Strictly positive float value used to modulate the logits distribution. A value smaller than &lt;span style=&#34;color:#e6db74&#34;&gt;`1`&lt;/span&gt; decreases randomness (and vice versa), with &lt;span style=&#34;color:#e6db74&#34;&gt;`0`&lt;/span&gt; being equivalent to shifting all probability mass to the most likely token
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;$$
+P(y_t=w|{y_{&amp;lt;t}})=\frac{exp(S_w/\tau)}{\sum_{w&amp;rsquo;\in Vexp(S_{w&amp;rsquo;}/\tau)}}\
+\tau&amp;gt;1,概率分布更均匀,输出更多样性\
+\tau&amp;lt;1,概率分布尖锐,输出更单一代码
+$$&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;logits&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;logits&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;temperature
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;probabilities&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;F&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;softmax(logits, dim&lt;span style=&#34;color:#f92672&#34;&gt;=-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;### hf 源码&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;TemperatureLogitsWarper&lt;/span&gt;(LogitsWarper):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; __init__(self, temperature: float):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;not&lt;/span&gt; isinstance(temperature, float) &lt;span style=&#34;color:#f92672&#34;&gt;or&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;not&lt;/span&gt; (temperature &lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            except_msg &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; (
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                &lt;span style=&#34;color:#e6db74&#34;&gt;f&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;`temperature` (=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;{&lt;/span&gt;temperature&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;) has to be a strictly positive float, otherwise your next token &amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;scores will be invalid.&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            )
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; isinstance(temperature, float) &lt;span style=&#34;color:#f92672&#34;&gt;and&lt;/span&gt; temperature &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.0&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                except_msg &lt;span style=&#34;color:#f92672&#34;&gt;+=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34; If you&amp;#39;re looking for greedy decoding strategies, set `do_sample=False`.&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#66d9ef&#34;&gt;raise&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ValueError&lt;/span&gt;(except_msg)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;temperature &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; temperature
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#a6e22e&#34;&gt;@add_start_docstrings&lt;/span&gt;(LOGITS_PROCESSOR_INPUTS_DOCSTRING)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; __call__(self, input_ids: torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;LongTensor, scores: torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;FloatTensor) &lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt; torch&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;FloatTensor:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        scores_processed &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; scores &lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt; self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;temperature
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; scores_processed
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Contrastive search：参考&lt;a class=&#34;link&#34; href=&#34;https://huggingface.co/blog/introducing-csearch&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;。背景：目前的解码方法分为了确定性（Deterministic Methods，如：greedy search、beam search）和随机性方法（top-k、top-p）。确定性方法存在的问题：会导致&lt;strong&gt;模型退化&lt;/strong&gt;，即生成的文本不自然且包含不必要的重复。不确定性方法存在的问题：虽然核采样可以生成没有重复的文本，但生成文本的语义一致性并不是很好。我们注意到，这种语义不一致的问题可以通过降低温度 (temperature) 来部分解决。然而，降低温度会使核采样更接近贪心搜索，这其实就变成了贪心搜索和核采样之间的权衡。一般来讲，要找到一个既能避免贪心搜索又能避免核采样陷阱的快捷且与模型无关的温度相当有挑战。引入对比搜索，公式如下：给定前t-1序列的token，来预测第t个token。其中v为k 个概率最大的候选词元的集合。p为模型对v集合中每个词元的预测概率。s(,)函数为计算候选集合中的每个token与前文token的相似程度。惩罚项的作用为防止模型退化，惩罚可能会重复生成的情况。当alpha为0时，退化为贪婪解码。当alpha越小，惩罚力度越小，反之亦然。
+$$
+\begin{equation}
+x_t = \arg\max_{v \in V^{(k)}} \left{ (1 - \alpha) \times \underbrace{p_{\theta}(v \mid x_{&amp;lt; t})}&lt;em&gt;{\text{model confidence}} - \alpha \times \left( \max \left{ \underbrace{s(h_v, h&lt;/em&gt;{x_j})}_{\text{degeneration penalty}} : 1 \leq j \leq t - 1 \right} \right) \right},
+\end{equation}
+$$
+贪婪解码和对比解码结果可视化对比：分别将贪心搜索和对比搜索生成的词元相似度矩阵可视化。两个词元之间的相似性被定义为它们的向量表征 (即最后一个转换器层的隐藏状态) 之间的余弦相似性。贪心搜索 (上) 和对比搜索 (下) 的结果。从贪心搜索的结果中，我们看到非对角线的相似度很高，这清楚地表明贪心搜索产生了重复。相反，在对比搜索的结果中，高相似度分数主要出现在对角线上，这证明我们成功解决了退化问题。对比搜索的这一优良特性是通过在解码过程中引入退化惩罚来实现的。&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;提高解码效果：背景：如果我的模型解码出了一个糟糕的序列呢？提出Re-ranking，即一次性解码出一批序列，定义打分函数（如：困惑度），基于评分重新排序后，选择评分最高的序列。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;NLG训练&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;NLG模型的一些问题：重复某段词语、复读机（大模型常见的问题，即直接将训练集中训练过的数据进行回答，没有进行思考。解决方案：引入多样性的训练数据，比如：math、coding提升LLM推理和思考能力。参考&lt;a class=&#34;link&#34; href=&#34;https://zhuanlan.zhihu.com/p/667274901&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;）&lt;/li&gt;
+&lt;li&gt;Exposure Bias：偏差放大。由于在训练时，使用教师强迫即输入的是人类的真实token，但预测时使用的是模型上一步预测的token，容易造成滚雪球式的错误，导致微笑错误不断放大&lt;/li&gt;
+&lt;li&gt;Exposure Bias的解决方案：（1）Scheduled sampling：训练时，将输入的token部分替换为模型上一步top-p解码出的token，而不完全是用golden token作为输入。不断增加p模拟实际预测时的情况。在实践中会带来改进，但可能会导致奇怪的训练目标，猜想可能是引入随机token后但不是匹配的目标token（2）Dataset Aggregation：在训练的不同时间间隔，从当前的模型生成序列，将这些序列作为额外的示例添加到训练集中（3）Retrieval Augmentation：学习从现有的人类写作原型语料库中检索序列（4）Reinforcement Learning：reward model需要的依据：基于验证指标：&lt;strong&gt;BLEU、ROUGE 、CIDEr、SPIDEr&lt;/strong&gt;、基于人类偏好：RLHF等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;评估NLG&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;基于内容重合度（规则）：计算生成的文本与黄金标准（人工编写的）文本之间的词汇相似性，主要为基于N-gram&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;BLEU&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ROUGE&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;METEOR&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CIDEr&lt;/p&gt;
+&lt;p&gt;基于规则指标的问题：对于相同意思，但是词汇并不相同的，并不有效。对于越是open的任务，越不理想。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;基于模型打分：使用学习到的单词和句子&lt;strong&gt;表征&lt;/strong&gt;来计算生成文本和参考文本之间的语义相似性、不再存在n-gram的瓶颈，因为文本单元被表示为嵌入、这些嵌入是预训练的，用于衡量相似性的距离度量可以是固定的&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Word distance functions：Vector Similarity、Word Mover’s Distance、BERTSCORE&lt;/li&gt;
+&lt;li&gt;Beyond word matching：Sentence Movers Similarity、BLEURT&lt;/li&gt;
+&lt;li&gt;Evaluating Open-ended Text Generation：MAUVE&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;基于人类评估：评估人员考虑的维度：流畅性、连贯性、事实性和正确性、常识性、风格、语法正确性、典型性、冗余&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;benchmark：许多benchmark主要为做文本分类或者选择题，计算准确度或者F1。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;伦理考虑：&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;自我放大效应：重复同一个phrase，并且重复的越多信心越大。目前规模和架构都还没有解决这种问题&lt;/p&gt;
+&lt;p&gt;减少重复方法&lt;/p&gt;
+&lt;p&gt;top-p，参考&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/dongtuoc/article/details/135042289?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522171034123216800215038564%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&amp;amp;request_id=171034123216800215038564&amp;amp;biz_id=0&amp;amp;utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-2-135042289-null-null.142%5ev99%5epc_search_result_base8&amp;amp;utm_term=top_p&amp;amp;spm=1018.2226.3001.4187&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;博客&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;解码引入随机性，模拟人类写做的波动：Top-k采样、top-p（更灵活的top-k，计算量没有区别，因为仍然要全部计算出词典所有单词的概率）&lt;/p&gt;
+&lt;p&gt;扩大随机性：温度系数：对所有输出除以t，再做softmax。输出会更加多样性、平坦均匀。&lt;/p&gt;
+&lt;p&gt;LLM容易出现幻觉的原因可能与解码策略有关：可归因于top-p采样为提高多样性而引入的随机性，这可能会无意中导致幻觉不足可归因于top-p采样为提高多样性而引入的随机性，这可能会无意中导致幻觉。随机性虽然是导致幻觉的因素，但是我们不能因噎废食，即不能为了缓解幻觉而导致大模型生成句子的流畅性大幅降低。https://zhuanlan.zhihu.com/p/664293575&lt;/p&gt;
+&lt;p&gt;腾讯LLM幻觉综述，参考&lt;a class=&#34;link&#34; href=&#34;https://www.jiqizhixin.com/articles/2023-09-14-2&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;链接&lt;/a&gt;：幻觉来源&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;大模型缺乏相关知识或者记忆错误知识&lt;/strong&gt;：在大模型回答用户问题或者解决更复杂的下游任务时，如果缺少了所需要的知识或者从训练数据中记忆了错误的知识，则有可能出现幻觉。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;大模型高估了自己的能力&lt;/strong&gt;：一些工作发现，大模型往往无法准确地估计自己的能力边界。因此，大模型在回复超出自己能力的问题时，往往会高估自己，从而自信地编造幻觉回复。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;对齐过程中引入幻觉&lt;/strong&gt;：大模型在预训练阶段外，还需要进行对齐，包括指令微调和 RLHF。这些步骤可能误导大模型出现幻觉。例如不恰当的指令微调可能让大模型学会捏造自己不会的答案，RLHF 也可能让大模型学会为了讨好人类而编造内容。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;生成过程中引入幻觉&lt;/strong&gt;：一些工作认为，不恰当的生成策略也可能导致大模型出现幻觉。例如，基于采样的解码生成方式中引入的随机性被证明可能导致幻觉，而大模型常用的自回归生成方式也可能导致幻觉的累积传播现象。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在LURE论文中，论述目标物体的不确定性，作者认为可能是由于束搜索导致的。可以解释为被采样的句子虽然整体不确定性低，但是对于那几个具体的目标物体可能存在不确定性。&lt;/p&gt;
+&lt;p&gt;曝光误差：（自回归的问题？？？？滚雪球式犯错）。解决：计划采样（训练时以概率p，使用预测的token代替gold token）、数据集（训练到一定程度后，用模型生成一些文本插入到数据集中）&lt;/p&gt;
+&lt;p&gt;评估指标：BLEU、ROUGE、CIDEr、SPIDEr&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;http://jalammar.github.io/illustrated-gpt2/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;http://jalammar.github.io/illustrated-gpt2/&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;prompt&#34;&gt;Prompt
+&lt;/h2&gt;&lt;p&gt;Prompt与微调的联系：在Prompt中给出case也能极大的提升最后的结果。但是prompt是输入给冻结的模型中。&lt;/p&gt;
+&lt;p&gt;要想通过Prompt提升最后的结果，给出的示例中不仅只要问题和最后答案，还应给出思维链过程，这会鼓励LM遵循这样的模式。&lt;/p&gt;
+&lt;h2 id=&#34;instruction&#34;&gt;Instruction
+&lt;/h2&gt;&lt;h2 id=&#34;rlhf&#34;&gt;RLHF
+&lt;/h2&gt;&lt;h2 id=&#34;dpo&#34;&gt;DPO
+&lt;/h2&gt;&lt;h2 id=&#34;reasoning&#34;&gt;Reasoning
+&lt;/h2&gt;&lt;h2 id=&#34;agents&#34;&gt;Agents
+&lt;/h2&gt;</description>
+        </item>
+        <item>
+        <title>网络抓包</title>
+        <link>https://sunnychenxiwang.github.io/post/%E7%BD%91%E7%BB%9C%E6%8A%93%E5%8C%85/</link>
+        <pubDate>Fri, 16 Aug 2024 11:27:45 +0800</pubDate>
+        
+        <guid>https://sunnychenxiwang.github.io/post/%E7%BD%91%E7%BB%9C%E6%8A%93%E5%8C%85/</guid>
+        <description></description>
+        </item>
+        <item>
         <title>数据结构与算法</title>
         <link>https://sunnychenxiwang.github.io/post/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/</link>
         <pubDate>Fri, 16 Aug 2024 11:08:12 +0800</pubDate>
