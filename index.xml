@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Hugo Theme Stack Starter</title>
-        <link>https://demo.stack.jimmycai.com/</link>
+        <link>http://localhost:1313/</link>
         <description>Recent content on Hugo Theme Stack Starter</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
-        <lastBuildDate>Sun, 27 Oct 2024 22:11:17 +0800</lastBuildDate><atom:link href="https://demo.stack.jimmycai.com/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Mon, 03 Mar 2025 17:58:03 +0800</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>Hello World</title>
-        <link>https://demo.stack.jimmycai.com/p/hello-world/</link>
+        <link>http://localhost:1313/p/hello-world/</link>
         <pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate>
         
-        <guid>https://demo.stack.jimmycai.com/p/hello-world/</guid>
-        <description>&lt;img src="https://demo.stack.jimmycai.com/p/hello-world/cover.jpg" alt="Featured image of post Hello World" /&gt;&lt;p&gt;Welcome to Hugo theme Stack. This is your first post. Edit or delete it, then start writing!&lt;/p&gt;
+        <guid>http://localhost:1313/p/hello-world/</guid>
+        <description>&lt;img src="http://localhost:1313/p/hello-world/cover.jpg" alt="Featured image of post Hello World" /&gt;&lt;p&gt;Welcome to Hugo theme Stack. This is your first post. Edit or delete it, then start writing!&lt;/p&gt;
 &lt;p&gt;For more information about this theme, check the documentation: &lt;a class=&#34;link&#34; href=&#34;https://stack.jimmycai.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;https://stack.jimmycai.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Want a site like this? Check out &lt;a class=&#34;link&#34; href=&#34;https://github.com/CaiJimmy/hugo-theme-stack-starter&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
@@ -25,11 +25,253 @@
 </description>
         </item>
         <item>
+        <title>幻觉</title>
+        <link>http://localhost:1313/p/%E5%B9%BB%E8%A7%89/</link>
+        <pubDate>Mon, 03 Mar 2025 17:58:03 +0800</pubDate>
+        
+        <guid>http://localhost:1313/p/%E5%B9%BB%E8%A7%89/</guid>
+        <description>&lt;p&gt;终极目标都是为了向可信大模型发展，尽管推理模型的出现极大的缓解了面向结果的幻觉，然而新的幻觉问题也出现了！&lt;/p&gt;
+&lt;h1 id=&#34;幻觉&#34;&gt;幻觉
+&lt;/h1&gt;&lt;h2 id=&#34;幻觉综述博客&#34;&gt;幻觉综述/博客
+&lt;/h2&gt;&lt;p&gt;Extrinsic Hallucinations in LLMs&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;链接地址：https://lilianweng.github.io/posts/2024-07-07-hallucination/&lt;/li&gt;
+&lt;li&gt;幻觉定义：Hallucination in large language models usually refers to the model generating unfaithful, fabricated, inconsistent, or nonsensical content。分类：（1）上下文幻觉（in-context hallucination）：模型输出应该与上下文中的源内容一致（2）外在幻觉（extrinsic hallucination）：模型的输出应与外部世界知识一致，当他不知道时应当承认不知道。&lt;/li&gt;
+&lt;li&gt;导致幻觉的原因：
+&lt;ul&gt;
+&lt;li&gt;Pre-training Data Issues：大量的预训练数据作为外部世界知识的代表。这些数据往往来自公共互联网，因此会出现过时、缺失或错误的信息。由于模型可能仅通过最大化对数似然来错误记住这些信息，我们可以预期模型会犯错。&lt;/li&gt;
+&lt;li&gt;Fine-tuning New Knowledge：&lt;a class=&#34;link&#34; href=&#34;https://arxiv.org/pdf/2405.05904&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;论文（Does Fine-Tuning LLMs on New Knowledge Encourage Hallucinations?）&lt;/a&gt;表示用新知识微调LLM可能会鼓励其生成幻觉：（1）LLM学习包含新知识的微调数据比学习与模型已有知识一致的数据速度更慢（2） 一旦这些包含新知识的示例被最终学习到，它们会增加模型产生幻觉的倾向。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Hallucination Detection：
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Retrieval-Augmented Evaluation：基于检索增强的幻觉评估&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://arxiv.org/abs/2206.04624&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;strong&gt;FactualityPrompt&lt;/strong&gt;&lt;/a&gt;：主要使用两种幻觉评估指标（1）Hallucination NE (Named Entity) errors：使用实体抽取模型抽取回应中的实体检测是否出现在真值文档（2）Entailment ratios:使用预训练模型roberta判断claim是否和wiki真值数据有关联。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;a class=&#34;link&#34; href=&#34;https://arxiv.org/abs/2305.14251&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;FActScore&lt;/a&gt;&lt;/strong&gt;：将长篇拆分为原子事实（claim），使用wiki检索来判断是否是幻觉。方法为使用检索+Nonparametric Masked Language Modeling的检测效果最佳。一些发现：在传记生成任务中，罕见的实体的错误率较高。 生成靠后面的token提到的事实的错误率较高。 使用检索来为模型生成提供依据显著有助于减少幻觉。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SAFE&lt;/strong&gt;：&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;FacTool&lt;/strong&gt;：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Sampling-Based Detection&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;SelfCheckGPT&lt;/strong&gt;：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Calibration of Unknown Knowledge&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Indirect Query&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Anti-Hallucination Methods：
+&lt;ul&gt;
+&lt;li&gt;RAG → Edits and Attribution&lt;/li&gt;
+&lt;li&gt;Chain of Actions&lt;/li&gt;
+&lt;li&gt;Sampling Methods&lt;/li&gt;
+&lt;li&gt;Fine-tuning for Factuality&lt;/li&gt;
+&lt;li&gt;Fine-tuning for Attribution
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;WebGPT&lt;/strong&gt;：&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;GopherCite&lt;/strong&gt;：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Evaluation Benchmarks
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/sylinrl/TruthfulQA&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;TruthfulQA&lt;/a&gt;&lt;/strong&gt;、&lt;a class=&#34;link&#34; href=&#34;https://github.com/nayeon7lee/FactualityPrompt&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;strong&gt;FactualityPrompt&lt;/strong&gt;&lt;/a&gt;、&lt;a class=&#34;link&#34; href=&#34;https://github.com/yinzhangyue/SelfAware&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;strong&gt;SelfAware&lt;/strong&gt;&lt;/a&gt;、&lt;a class=&#34;link&#34; href=&#34;https://github.com/google-deepmind/long-form-factuality/tree/main/longfact&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;strong&gt;LongFact&lt;/strong&gt;&lt;/a&gt;、&lt;a class=&#34;link&#34; href=&#34;https://github.com/microsoft/HaDes&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;strong&gt;HaDes&lt;/strong&gt;&lt;/a&gt;、&lt;a class=&#34;link&#34; href=&#34;https://fever.ai/dataset/fever.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;strong&gt;FEVER&lt;/strong&gt;&lt;/a&gt;、&lt;a class=&#34;link&#34; href=&#34;https://huggingface.co/datasets/fava-uw/fava-data&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;strong&gt;FAVABench&lt;/strong&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;幻觉数据集构建&#34;&gt;幻觉数据集构建
+&lt;/h2&gt;&lt;h3 id=&#34;多模态幻觉benchmark&#34;&gt;多模态幻觉Benchmark
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;POPE
+&lt;ul&gt;
+&lt;li&gt;提出了评估LVLM中的Object幻觉方法，Polling-based Object Probing Evaluation&lt;/li&gt;
+&lt;li&gt;评估目标幻觉的挑战：解析生成的描述来提取目标需要工设计复杂的规则，仍然难以避免遗漏或错误分类对象&lt;/li&gt;
+&lt;li&gt;核心思想：将幻觉评估转换成二元分类任务（但被HaELM验证，这和LVLM在真实使用场景下，即输出response中的幻觉评估结果没有必然联系），询问的目标包含三种类型：随机目标、频繁目标、对抗目标（选取前k个与真实目标共现频率最大的目标）&lt;/li&gt;
+&lt;li&gt;构建方法：人工或使用自动分割工具SEEM提取真实对象，再按策略负采样出三种类型的目标&lt;/li&gt;
+&lt;li&gt;缺陷：1）仅关注了目标幻觉，没有考虑LVLM的其他方面的性能。2）提示存在的偏差会影响评估结果&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;HaELM
+&lt;ul&gt;
+&lt;li&gt;提出了基于LLM的幻觉评估方法，收集幻觉和非幻觉数据微调LLAMA&lt;/li&gt;
+&lt;li&gt;幻觉数据构建方法：提示ChatGPT，通过参考标题生成幻觉数据&lt;/li&gt;
+&lt;li&gt;缺陷：仅使用LLM来判断LVLM中幻觉，不靠谱。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;LRV
+&lt;ul&gt;
+&lt;li&gt;解决的问题：使MLLM遵循指令、缓解幻觉（主要关注目标和属性）&lt;/li&gt;
+&lt;li&gt;指令数据集构建：1）Positive视觉指令：提示GPT4生成指令（包含提问和对应的答案），覆盖16个视觉-文本任务。2）Negative视觉指令：提示GPT4生成有关不存在的目标，错误的属性等指令并生成答案&lt;/li&gt;
+&lt;li&gt;模型微调：微调MiniGPT4（仅训练线性投影层）和Mplug-owl（冻结视觉，微调LLM）&lt;/li&gt;
+&lt;li&gt;评估方法（GAVIE）：通过提示GPT4，比较人类输入指令以及MLLM输出，进行打分。主要衡量相关性（响应是否直接遵循指令），准确性（是否出现幻觉）&lt;/li&gt;
+&lt;li&gt;结果分析：1）幻觉成因：当前MLLM的训练数据缺少负面指令数据。2）属性比目标更具有挑战性，需要更强的视觉编码器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Bingo
+&lt;ul&gt;
+&lt;li&gt;构建了一些特殊的case，用于分析GPT4V幻觉&lt;/li&gt;
+&lt;li&gt;幻觉分类：偏差（区域、OCR、事实）、干扰（图像到图像、文本到图像）&lt;/li&gt;
+&lt;li&gt;结果分析：1）区域偏差：面对西方图像的性能比东亚效果更好。2）OCR偏差：面对英语的OCR能力比中文强。3）事实偏差：当输入包含反事实知识的图像，即输入图像与所学事实知识冲突时，性能较差。4）图像到图像干扰：输入相似图像干扰能力。5）文本到图像干扰：人类输入文本干扰能力&lt;/li&gt;
+&lt;li&gt;如何减少幻觉：引入Self-Correction或CoT可以减少幻觉（提示词参考原文），Self-Correction减轻幻觉的效果最好，CoT效果有限（考虑能否加入样例，能提升效果）。总之，二者效果均有限&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;AMBER
+&lt;ul&gt;
+&lt;li&gt;一个免LLM的幻觉检测方法：基于语言工具包NLTK、Spacy，提取输出的目标、近义词等，再根据注释的标签进行幻觉评估&lt;/li&gt;
+&lt;li&gt;任务分类：生成式、判别式&lt;/li&gt;
+&lt;li&gt;数据集构建：判别式任务标注二分类标签，生成式任务不需标注（仅让MLLM生成输出即可）&lt;/li&gt;
+&lt;li&gt;局限：生成任务仅能检测目标幻觉，属性、关系等不能检测&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;幻觉评估修正检测方法&#34;&gt;幻觉评估、修正、检测方法
+&lt;/h2&gt;&lt;h3 id=&#34;基于工具增强&#34;&gt;基于工具增强
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Factool
+&lt;ul&gt;
+&lt;li&gt;面向文本任务的单模态幻觉检测，包括：知识问答、代码生成、数学问题、文献写作&lt;/li&gt;
+&lt;li&gt;基座（GPT3.5）+工具（搜索引擎、Python解释器、计算器）&lt;/li&gt;
+&lt;li&gt;Pipeline：声明抽取、问题生成（生成工具的输入形式）、工具执行、证据收集（汇集工具的输出形式）、最后的判断&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Woodpecker
+&lt;ul&gt;
+&lt;li&gt;面向视觉-语言的多模态幻觉检测，包括：目标（是否存在、目标数量）、属性（颜色、位置、动作等）&lt;/li&gt;
+&lt;li&gt;基座（GPT3.5）+工具（专家目标检测模型、视觉-语言）&lt;/li&gt;
+&lt;li&gt;Pipeline：关键词抽取（生成目标检测模型的输入形式）、问题生成、工具执行、汇总证据并修正&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;模型训练&#34;&gt;模型训练
+&lt;/h3&gt;&lt;p&gt;模型训练（微调）：1）根本策略：调整训练MLLM的模型架构或者训练策略（如：LLAVA-RLHF、HACL），从根本上缓解MLLM的幻觉问题。2）直接策略：标注幻觉数据集，训练幻觉检测/评估模型&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;LLAVA-RLHF&lt;/li&gt;
+&lt;li&gt;HACL&lt;/li&gt;
+&lt;li&gt;LRV
+&lt;ul&gt;
+&lt;li&gt;关注目标、属性、事实知识方面的幻觉&lt;/li&gt;
+&lt;li&gt;负样本指令数据集构建：提示GPT4生成&amp;lt;问题，答案&amp;gt;，微调MLLM&lt;/li&gt;
+&lt;li&gt;模型微调：微调MiniGPT4（仅训练线性投影层）和Mplug-owl（冻结视觉，微调LLM）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;LURE
+&lt;ul&gt;
+&lt;li&gt;主要关注Object幻觉，同时分析了Object幻觉成因：共现、不确定性、在文本的位置&lt;/li&gt;
+&lt;li&gt;幻觉训练/评估数据集构建：在正确的数据（LLAVA-150K）中，提示GPT加入幻觉信息（引入共现物体），将不确定性物体和靠文本位置后的物体用占位符替换（LVLM的操作）。Revisor的目标为原始干净数据，需去除共现物体，重新审视不确定性和位置靠后的物体。&lt;/li&gt;
+&lt;li&gt;模型训练：通过幻觉数据集微调MiniGPT4（但通常说，这依然不靠谱，仍然需借助外部工具来判断）&lt;/li&gt;
+&lt;li&gt;局限：1）仅关注了目标幻觉。2）推理时也需将LVLM输出替换不确定性物体和位置靠后的物体再将替换后的文本输入Revisor，对于一些没法获得不确定性token的情况，不奏效。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;语言模型幻觉&#34;&gt;语言模型幻觉
+&lt;/h2&gt;&lt;h2 id=&#34;多模态幻觉&#34;&gt;多模态幻觉
+&lt;/h2&gt;&lt;p&gt;参考资源&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;论文合集：https://github.com/showlab/Awesome-MLLM-Hallucination&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;幻觉机理&#34;&gt;幻觉机理
+&lt;/h2&gt;&lt;p&gt;目前来看本质上单模态和多模态的幻觉机理是通用的，都是目前的注意力模式导致的信息流损失&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;单模态：更关注一些Label anchor，可能会忽视重要信息&lt;/li&gt;
+&lt;li&gt;多模态：token序列过长，浅层更关注视觉token，深层关注一些文本token（表现出LLM先验）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;整理结论（方法自己整理）&lt;/p&gt;
+&lt;h3 id=&#34;基于内部表征的幻觉机理&#34;&gt;基于内部表征的幻觉机理
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;The Internal State of an LLM Knows When It&amp;rsquo;s Lying：面向事实性幻觉，内部表征训练分类器检测句子级是否是真实的。结论：使用较高层的表征效果更好，如20-28层（中间层偏后层）。&lt;/li&gt;
+&lt;li&gt;INSIDE: LLMS&amp;rsquo; INTERNAL STATES RETAIN THEPOWER OF HALLUCINATION DETECTION：面向语义方面的幻觉。比较了一些不确定性的方法（token-levels）&lt;strong&gt;（ICLR2024的工作在intro 和 related work引用了很多有关不确定性和知识边界的相关工作）&lt;/strong&gt;。目前的相关工作针对于token-level以及language-level（即提示LLM输出使llm对同一问题生成多个响应，并评估这些响应的自一致性做幻觉检测），作者这里利用LLM的内部表征做语义的不确定性（幻觉检测）&lt;/li&gt;
+&lt;li&gt;Discovering Latent Knowledge in Language Models Without Supervision：&lt;/li&gt;
+&lt;li&gt;Unsupervised Real-Time Hallucination Detection based on the Internal States of Large Language Models：&lt;/li&gt;
+&lt;li&gt;LLM Internal States Reveal Hallucination Risk Faced With a Query：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;基于不确定性的幻觉机理&#34;&gt;基于不确定性的幻觉机理
+&lt;/h3&gt;&lt;h3 id=&#34;基于后处理的幻觉机理&#34;&gt;基于后处理的幻觉机理
+&lt;/h3&gt;&lt;p&gt;通常指通过采样多条输出来判断一致性的方法，是一种language-level的检测手段&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Language Models (Mostly) Know What They Know：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;其他&#34;&gt;其他
+&lt;/h3&gt;&lt;p&gt;总结与思考&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;几乎所有工作都表明，最后一个token的中高层（32层LLaMA的20-28层）activation hidden representation 是最佳内部状态选择，在达到最佳效果的同时避免冗余。由于预训练所学的知识分布编码在模型参数中，而这些中高层的隐藏特征作为知识探针效果最好，所以大胆猜测，这个知识分布主要包含在这几层网络参数中，这也是很多知识编辑的工作都选择在中高层网络编辑的原因；相反越接近输出层的探针效果反而越不好，因此也可以猜测这几层参数主要负责将高维的空间分布“可视化”到人类文本的空间，损失部分信息。&lt;/p&gt;
+&lt;p&gt;此外，大部分工作对内部状态的研究都是“横向”的，即只提取一层的状态观察效果或编辑，只有少量工作如Dola对不同层的状态进行纵向对比，“纵向”特征的变化包含着更丰富的过程信息，这也许对于探测模型的“思考过程”会更有帮助。&lt;/p&gt;
+&lt;p&gt;大模型的内部状态是模型进行复杂任务的核心，它不仅存储和传递信息，还通过层次化的表征来生成最终输出，实现对复杂文本的真实性检测和理解等，总之这部分的研究上限还很高。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;幻觉评估&#34;&gt;幻觉评估
+&lt;/h2&gt;&lt;p&gt;现在的benchmark倾向于使用一种分数来评估，但是我们不是希望大模型欺骗出题人得到高分而是希望能真正检测到大模型的能力。&lt;/p&gt;
+&lt;p&gt;比如常见的VQA，往往采用yes/no或者选择题的形式，同时为了便于评估还往往加入“请只用一个单词回答”。而经过指令微调后的大模型，往往倾向于给出一个回复（尽管可能不知道），这导致测出来的结果往往会比大模型的能力虚高。&lt;/p&gt;
+&lt;h1 id=&#34;不确定性&#34;&gt;不确定性
+&lt;/h1&gt;&lt;p&gt;参考文章系列：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://zhuanlan.zhihu.com/p/696065154&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://zhuanlan.zhihu.com/p/696065154&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://zhuanlan.zhihu.com/p/713737141&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://zhuanlan.zhihu.com/p/713737141&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;简介&#34;&gt;简介
+&lt;/h2&gt;&lt;p&gt;参考《A Survey on Hallucination in Large Language Models》&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;什么是大语言模型幻觉：大语言模型偶尔会生成与用户输入背道而驰，与先前生成的上下文相矛盾或与已确立的世界知识不符的内容。总之，指的是生成与提供的源内容不符合逻辑或不忠实的内容&lt;/li&gt;
+&lt;li&gt;幻觉类型：&lt;strong&gt;Input-conflicting幻觉&lt;/strong&gt;，即大型语言模型生成与用户提供的源输入不符的内容；&lt;strong&gt;Context-conflicting幻觉&lt;/strong&gt;，即大型语言模型生成与其自己之前生成的信息相冲突的内容；&lt;strong&gt;Fact-conflicting幻觉&lt;/strong&gt;，即大型语言模型生成不符合已确立的世界知识的内容。&lt;/li&gt;
+&lt;li&gt;大语言模型幻觉的挑战来源（区别于一般模型）：&lt;strong&gt;Massive training data大规模训练数据&lt;/strong&gt;：与为特定任务精心策划数据不同，LLM的预训练使用来自网络的数万亿词元，这使得难以消除&lt;strong&gt;虚构、过时或偏见&lt;/strong&gt;信息。&lt;strong&gt;Versatility of LLMs LLM的多功能性&lt;/strong&gt;：通用型LLM被期望在跨任务、跨语言和跨领域的环境中表现出色，这给幻觉的全面评估和缓解带来了挑战。&lt;strong&gt;Imperceptibility of errors错误的难以察觉性&lt;/strong&gt;：作为其强大能力的副产品，LLM可能生成起初看似高度合理的虚假信息，这使得模型甚至人类难以检测到幻觉。&lt;/li&gt;
+&lt;li&gt;除了幻觉以外的大语言模型问题：&lt;strong&gt;模糊性（Ambiguity）&lt;/strong&gt;：这种问题发生在LLM的响应具有歧义，容易产生多种解释。响应不一定是错误的，但它未能提供对用户问题有用的答案。&lt;strong&gt;不完整性（Incompleteness）&lt;/strong&gt;：不完整性问题发生在生成的响应是不完整或片段化的情况下。&lt;strong&gt;偏见（Bias）&lt;/strong&gt;：LLMs中的偏见涉及到在生成的文本中表现出的不公平或偏见态度。这些偏见可能来源于训练数据，这些数据通常包括历史文本、文学作品、社交媒体内容和其他来源。这些来源可能本质上反映了社会偏见、性别偏见、刻板印象或歧视性信仰。&lt;strong&gt;信息不足（Under-informativeness）&lt;/strong&gt;：这种问题指的是LLMs倾向于回避回答某些问题或提供特定信息，即使它们本应该有这个能力。例如，由于奖励模型的不完善，RLHF可能导致LLMs的过度优化，可能导致信息不足的状态。表2中呈现了一个例子，LLM拒绝回答用户的查询。&lt;/li&gt;
+&lt;li&gt;LLM幻觉的评估：幻觉评估格式：基于生成事实性陈述或将其与非事实性陈述区分开的能力；幻觉评估方式：人工式（为生成的文本标注：支持、不支持、不相关。特点：带有主观性且成本高）、基于模型的自动评估（如单独训练GPT-judge来评估真实性）、基于规则的自动评估（准确度等指标）&lt;/li&gt;
+&lt;li&gt;LLM幻觉的来源：&lt;strong&gt;缺乏相关知识或虚假知识&lt;/strong&gt;、&lt;strong&gt;LLMs可能高估&lt;/strong&gt;、&lt;strong&gt;问题对齐过程存在问题&lt;/strong&gt;、。。。&lt;/li&gt;
+&lt;li&gt;LLM幻觉的缓解（依照开发一个LLM的生命周期来进行阐述）：在预训练阶段缓解（LLM的知识主要是在预训练阶段获得，需考虑减少数据集中的噪音：人工筛选、自动选择等）、在监督式微调下的缓解、在RLHF时期缓解（利用人类反馈不仅可以缩小机器生成内容与人类偏好之间的差距，还有助于LLMs与期望的标准或目标保持一致）、推理时期缓解&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;大型视觉-语言模型中幻觉的评估与分析&#34;&gt;大型视觉-语言模型中幻觉的评估与分析
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;LVLM幻觉：回应并不在视觉输入中存在，这带来了潜在的重大风险后果。&lt;/li&gt;
+&lt;li&gt;LVLM（mPLUG-Owl、MiniGPT-4、LLaVA）继承了VLPM（Vision-Language Pre-trained Models）和LLM（Large Language Models）的优势和缺点：对于VLPMs，挑战在于准确地表示抽象视觉编码中的视觉信息；对于LLMs来说，幻觉主要源自训练数据中存在噪音&lt;/li&gt;
+&lt;li&gt;工作内容：发现了在理想化的幻觉场景中，LVLMs很容易受到提示的影响，导致结果与真实世界情境中的幻觉不相关；首次利用LLM进行LVLMs内的幻觉评估，提出的框架具有低成本、可重复性、隐私保护和本地部署&lt;/li&gt;
+&lt;li&gt;动机：基于prompt来检验出的幻觉和真实场景下出现的幻觉没有必然联系&lt;/li&gt;
+&lt;li&gt;方法：&lt;strong&gt;数据收集阶段&lt;/strong&gt;：随机选择图片，用指令“描述这张图片”来查询LVLMs，并手动注释幻觉回应，以获取现实幻觉收集。随后，我们的目标是批量获取大量的幻觉数据。我们考虑使用ChatGPT通过手动构建基于提供的图像参考说明的提示来生成幻觉。我们通过人类相似性评估将ChatGPT生成的幻觉数据与现实幻觉数据进行比较。我们反复修改提示，使两者的模式能够紧密对齐，如图3右侧所示。我们的幻觉数据收集格式如图4所示。最后，我们收集非幻觉数据。通过请求ChatGPT基于参考说明生成详细描述，我们可以轻松获得所需的数据。但是，关键是要强调生成的描述必须严格遵循参考说明中存在的对象，不得引入任何不存在的元素、&lt;strong&gt;训练和推理阶段&lt;/strong&gt;：在训练阶段，我们采用了与LLMs和指导微调的数据分布相一致的格式提示。前一步骤收集的数据被无缝地整合到提示中，作为通过自回归训练过程对LLM进行微调的训练数据。在推理阶段，我们将待评估的LVLMs的参考说明和回应合并到提示中。然后，将这些输入馈送到经过精心训练的评估模型中以获取判断结果。一旦数据收集和训练完成，HaELM可以多次重复使用，从而在保证可重复性的同时具有成本优势，这与ChatGPT相比。此外，HaELM是基于开源LLM构建的，允许本地部署，因此不需要上传数据，也能保障数据隐私。（感觉就是一个除噪筛选的过程：根据某种指令不断优化至贴合真实情况幻觉，然后筛选出干净的数据集）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;思考&#34;&gt;思考
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;为什么是大语言模型会出现幻觉，一般的小模型会出现吗？还是说幻觉只是一种没训练好的性能模型——解决：在传统的自然语言生成（NLG）环境中已经广泛研究了幻觉问题《Survey of hallucination in natural language generation》&lt;/li&gt;
+&lt;li&gt;思考LVLM的结构，是什么导致LVLM的幻觉可从结构出发&lt;/li&gt;
+&lt;li&gt;为什么小模型的幻觉率（这里可以泛指准确率）要低一些，比如MAERec的OCR能力比GPT4V更强&lt;/li&gt;
+&lt;li&gt;多模态幻觉的具体定义可参考LLM幻觉的定义分类&lt;/li&gt;
+&lt;li&gt;根据现象LVLM的幻觉：1）在视觉指令中频繁出现或与图像中的物体共现的物体，很明显容易被大型视觉语言模型产生幻觉。即会让LVLM误以为这些事物之间有某种关联，这是对于训练数据而言。2）文本和视觉不匹配，如何准确获得图形token。由于当前的大型多模态模型是基于强大的大型语言模型构建的，它们可能过度依赖语言先验知识，生成更有可能与指令文本一起出现的单词，而不考虑图像内容（图像token和文本token不在同一个语义空间），LVLM整体训练时文本模态过强，可考虑对文本模态抑制平衡视觉和文本模态。参考《Aligning large multi-modal model with robust instruction tuning》。但是很难分辨出到底是哪一种原因导致的。&lt;/li&gt;
+&lt;li&gt;原因及解决办法：1）大模型生成是自回归模式（可从LLM训练的方式入手：Bert完形填空、GPT），可能先前生成的错误信息，大模型无法对其进行纠正，导致错上加错。如MiniGPT-4无法对其纠正，需对大模型进行监督式的微调。2）可采用更强的对齐策略。&lt;/li&gt;
+&lt;li&gt;LVLM检测方法：（1）图文匹配CLIP。（2）或者额外训练模型&lt;/li&gt;
+&lt;li&gt;既然已经有了自动化评估幻觉的方法，为何还要单独构建一个数据集&lt;/li&gt;
+&lt;li&gt;LVLM的模型架构与工具学习的关系：（1）LVLM先输入图片得到图片特征向量，然后经过转换层映射到大模型可以理解的特征。（2）输入指令（提示+工具信息）。总之，LVLM需要依据图片信息和工具信息共同做出判断。&lt;/li&gt;
+&lt;li&gt;幻觉有很多类型：事实类型（其实是偏向于知识，专业称为unfaithful）、语义类型（和自身输出的逻辑矛盾或者无意义，inconsistent, or nonsensical）。个人偏向于不同的幻觉类型内部机理可能不一样，但是解决方法可以一统。&lt;/li&gt;
+&lt;li&gt;基于后处理的，幻觉矫正和幻觉检测，个人认为花销很大的方法没有意义，如基于模型的方法，首先会第二次前向传播开销大，其次模型本身也具有幻觉不靠谱。如果是基于rule-base或者轻量级的classifier提醒用户注意幻觉是有意义的&lt;/li&gt;
+&lt;li&gt;缓解幻觉的方法：（1）基于训练：但是根据目前来看，单次推理总是存在信息损失很难做到真正的幻觉缓解（2）基于推理：约束解码、o1式的多次推理或者利用memory有很大潜力&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
         <title>Min P 采样</title>
-        <link>https://demo.stack.jimmycai.com/p/min-p-%E9%87%87%E6%A0%B7/</link>
+        <link>http://localhost:1313/p/min-p-%E9%87%87%E6%A0%B7/</link>
         <pubDate>Sun, 27 Oct 2024 22:11:17 +0800</pubDate>
         
-        <guid>https://demo.stack.jimmycai.com/p/min-p-%E9%87%87%E6%A0%B7/</guid>
+        <guid>http://localhost:1313/p/min-p-%E9%87%87%E6%A0%B7/</guid>
         <description>&lt;h1 id=&#34;min-p-采样&#34;&gt;Min-p 采样
 &lt;/h1&gt;&lt;p&gt;在最近各种解码策略神仙打架的时代，再次出现了一种简单有效的解码策略：Min-p采样。&lt;/p&gt;
 &lt;p&gt;认为有一下缺陷&lt;/p&gt;
@@ -95,10 +337,10 @@
         </item>
         <item>
         <title>KV Cache</title>
-        <link>https://demo.stack.jimmycai.com/p/kv-cache/</link>
+        <link>http://localhost:1313/p/kv-cache/</link>
         <pubDate>Mon, 16 Sep 2024 10:25:56 +0800</pubDate>
         
-        <guid>https://demo.stack.jimmycai.com/p/kv-cache/</guid>
+        <guid>http://localhost:1313/p/kv-cache/</guid>
         <description>&lt;h1 id=&#34;kv-cache&#34;&gt;KV Cache
 &lt;/h1&gt;&lt;p&gt;目前KV Cache 已经被广泛用于Tranformer架构的模型&lt;/p&gt;
 &lt;h2 id=&#34;参考资料&#34;&gt;参考资料
@@ -111,10 +353,10 @@
         </item>
         <item>
         <title>Beam Search实现</title>
-        <link>https://demo.stack.jimmycai.com/p/beam-search%E5%AE%9E%E7%8E%B0/</link>
+        <link>http://localhost:1313/p/beam-search%E5%AE%9E%E7%8E%B0/</link>
         <pubDate>Sun, 18 Aug 2024 10:11:38 +0800</pubDate>
         
-        <guid>https://demo.stack.jimmycai.com/p/beam-search%E5%AE%9E%E7%8E%B0/</guid>
+        <guid>http://localhost:1313/p/beam-search%E5%AE%9E%E7%8E%B0/</guid>
         <description>&lt;h1 id=&#34;beam-search源码实现&#34;&gt;Beam Search源码实现
 &lt;/h1&gt;&lt;p&gt;Beam search 原理&lt;/p&gt;
 &lt;p&gt;贪婪解码的局限性：局部最优并非全局最优&lt;/p&gt;
@@ -125,10 +367,10 @@
         </item>
         <item>
         <title>自然语言处理基础</title>
-        <link>https://demo.stack.jimmycai.com/p/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%9F%BA%E7%A1%80/</link>
+        <link>http://localhost:1313/p/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%9F%BA%E7%A1%80/</link>
         <pubDate>Fri, 16 Aug 2024 20:36:47 +0800</pubDate>
         
-        <guid>https://demo.stack.jimmycai.com/p/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%9F%BA%E7%A1%80/</guid>
+        <guid>http://localhost:1313/p/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%9F%BA%E7%A1%80/</guid>
         <description>&lt;h1 id=&#34;自然语言处理基础&#34;&gt;自然语言处理基础
 &lt;/h1&gt;&lt;p&gt;主要根据cs224n做笔记，动手学深度学习为辅&lt;/p&gt;
 &lt;p&gt;参考资源&lt;/p&gt;
@@ -1660,18 +1902,18 @@ $$
         </item>
         <item>
         <title>网络抓包</title>
-        <link>https://demo.stack.jimmycai.com/p/%E7%BD%91%E7%BB%9C%E6%8A%93%E5%8C%85/</link>
+        <link>http://localhost:1313/p/%E7%BD%91%E7%BB%9C%E6%8A%93%E5%8C%85/</link>
         <pubDate>Fri, 16 Aug 2024 20:36:34 +0800</pubDate>
         
-        <guid>https://demo.stack.jimmycai.com/p/%E7%BD%91%E7%BB%9C%E6%8A%93%E5%8C%85/</guid>
+        <guid>http://localhost:1313/p/%E7%BD%91%E7%BB%9C%E6%8A%93%E5%8C%85/</guid>
         <description></description>
         </item>
         <item>
         <title>数据结构与算法</title>
-        <link>https://demo.stack.jimmycai.com/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/</link>
+        <link>http://localhost:1313/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/</link>
         <pubDate>Fri, 16 Aug 2024 20:33:39 +0800</pubDate>
         
-        <guid>https://demo.stack.jimmycai.com/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/</guid>
+        <guid>http://localhost:1313/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/</guid>
         <description>&lt;h1 id=&#34;基础算法&#34;&gt;基础算法
 &lt;/h1&gt;&lt;p&gt;acwing的学习笔记&lt;/p&gt;
 &lt;h2 id=&#34;1基础算法&#34;&gt;1.基础算法
@@ -12214,26 +12456,26 @@ f[j]表示：拿了总体积不超过j的物品，最大总价值。&lt;/p&gt;
         </item>
         <item>
         <title>投机采样</title>
-        <link>https://demo.stack.jimmycai.com/p/%E6%8A%95%E6%9C%BA%E9%87%87%E6%A0%B7/</link>
+        <link>http://localhost:1313/p/%E6%8A%95%E6%9C%BA%E9%87%87%E6%A0%B7/</link>
         <pubDate>Fri, 16 Aug 2024 20:31:49 +0800</pubDate>
         
-        <guid>https://demo.stack.jimmycai.com/p/%E6%8A%95%E6%9C%BA%E9%87%87%E6%A0%B7/</guid>
+        <guid>http://localhost:1313/p/%E6%8A%95%E6%9C%BA%E9%87%87%E6%A0%B7/</guid>
         <description></description>
         </item>
         <item>
         <title>Flash Attention</title>
-        <link>https://demo.stack.jimmycai.com/p/flash-attention/</link>
+        <link>http://localhost:1313/p/flash-attention/</link>
         <pubDate>Fri, 16 Aug 2024 20:31:19 +0800</pubDate>
         
-        <guid>https://demo.stack.jimmycai.com/p/flash-attention/</guid>
+        <guid>http://localhost:1313/p/flash-attention/</guid>
         <description></description>
         </item>
         <item>
         <title>Markdown Syntax Guide</title>
-        <link>https://demo.stack.jimmycai.com/p/markdown-syntax-guide/</link>
+        <link>http://localhost:1313/p/markdown-syntax-guide/</link>
         <pubDate>Thu, 07 Sep 2023 00:00:00 +0000</pubDate>
         
-        <guid>https://demo.stack.jimmycai.com/p/markdown-syntax-guide/</guid>
+        <guid>http://localhost:1313/p/markdown-syntax-guide/</guid>
         <description>&lt;p&gt;This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.&lt;/p&gt;
 &lt;h2 id=&#34;headings&#34;&gt;Headings
 &lt;/h2&gt;&lt;p&gt;The following HTML &lt;code&gt;&amp;lt;h1&amp;gt;&lt;/code&gt;—&lt;code&gt;&amp;lt;h6&amp;gt;&lt;/code&gt; elements represent six levels of section headings. &lt;code&gt;&amp;lt;h1&amp;gt;&lt;/code&gt; is the highest section level while &lt;code&gt;&amp;lt;h6&amp;gt;&lt;/code&gt; is the lowest.&lt;/p&gt;
@@ -12430,11 +12672,11 @@ f[j]表示：拿了总体积不超过j的物品，最大总价值。&lt;/p&gt;
         </item>
         <item>
         <title>Image gallery</title>
-        <link>https://demo.stack.jimmycai.com/p/image-gallery/</link>
+        <link>http://localhost:1313/p/image-gallery/</link>
         <pubDate>Sat, 26 Aug 2023 00:00:00 +0000</pubDate>
         
-        <guid>https://demo.stack.jimmycai.com/p/image-gallery/</guid>
-        <description>&lt;img src="https://demo.stack.jimmycai.com/p/image-gallery/2.jpg" alt="Featured image of post Image gallery" /&gt;&lt;p&gt;Hugo theme Stack supports the creation of interactive image galleries using Markdown. It&amp;rsquo;s powered by &lt;a class=&#34;link&#34; href=&#34;https://photoswipe.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+        <guid>http://localhost:1313/p/image-gallery/</guid>
+        <description>&lt;img src="http://localhost:1313/p/image-gallery/2.jpg" alt="Featured image of post Image gallery" /&gt;&lt;p&gt;Hugo theme Stack supports the creation of interactive image galleries using Markdown. It&amp;rsquo;s powered by &lt;a class=&#34;link&#34; href=&#34;https://photoswipe.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;PhotoSwipe&lt;/a&gt; and its syntax was inspired by &lt;a class=&#34;link&#34; href=&#34;https://typlog.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;Typlog&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;To use this feature, the image must be in the same directory as the Markdown file, as it uses Hugo&amp;rsquo;s page bundle feature to read the dimensions of the image. &lt;strong&gt;External images are not supported.&lt;/strong&gt;&lt;/p&gt;
@@ -12448,10 +12690,10 @@ f[j]表示：拿了总体积不超过j的物品，最大总价值。&lt;/p&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;h2 id=&#34;result&#34;&gt;Result
-&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://demo.stack.jimmycai.com/p/image-gallery/1.jpg&#34;
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;http://localhost:1313/p/image-gallery/1.jpg&#34;
 	width=&#34;2000&#34;
 	height=&#34;1400&#34;
-	srcset=&#34;https://demo.stack.jimmycai.com/p/image-gallery/1_hu4574578169203714971.jpg 480w, https://demo.stack.jimmycai.com/p/image-gallery/1_hu9042511268598201431.jpg 1024w&#34;
+	srcset=&#34;http://localhost:1313/p/image-gallery/1_hu4574578169203714971.jpg 480w, http://localhost:1313/p/image-gallery/1_hu9042511268598201431.jpg 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;Image 1&#34;
@@ -12461,10 +12703,10 @@ f[j]表示：拿了总体积不超过j的物品，最大总价值。&lt;/p&gt;
 		data-flex-grow=&#34;142&#34;
 		data-flex-basis=&#34;342px&#34;
 	
-&gt; &lt;img src=&#34;https://demo.stack.jimmycai.com/p/image-gallery/2.jpg&#34;
+&gt; &lt;img src=&#34;http://localhost:1313/p/image-gallery/2.jpg&#34;
 	width=&#34;1500&#34;
 	height=&#34;2250&#34;
-	srcset=&#34;https://demo.stack.jimmycai.com/p/image-gallery/2_hu10699635480308914167.jpg 480w, https://demo.stack.jimmycai.com/p/image-gallery/2_hu1741040415904021193.jpg 1024w&#34;
+	srcset=&#34;http://localhost:1313/p/image-gallery/2_hu10699635480308914167.jpg 480w, http://localhost:1313/p/image-gallery/2_hu1741040415904021193.jpg 1024w&#34;
 	loading=&#34;lazy&#34;
 	
 		alt=&#34;Image 2&#34;
@@ -12485,11 +12727,11 @@ f[j]表示：拿了总体积不超过j的物品，最大总价值。&lt;/p&gt;
         </item>
         <item>
         <title>Shortcodes</title>
-        <link>https://demo.stack.jimmycai.com/p/shortcodes/</link>
+        <link>http://localhost:1313/p/shortcodes/</link>
         <pubDate>Fri, 25 Aug 2023 00:00:00 +0000</pubDate>
         
-        <guid>https://demo.stack.jimmycai.com/p/shortcodes/</guid>
-        <description>&lt;img src="https://demo.stack.jimmycai.com/p/shortcodes/cover.jpg" alt="Featured image of post Shortcodes" /&gt;&lt;p&gt;For more details, check out the &lt;a class=&#34;link&#34; href=&#34;https://stack.jimmycai.com/writing/shortcodes&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+        <guid>http://localhost:1313/p/shortcodes/</guid>
+        <description>&lt;img src="http://localhost:1313/p/shortcodes/cover.jpg" alt="Featured image of post Shortcodes" /&gt;&lt;p&gt;For more details, check out the &lt;a class=&#34;link&#34; href=&#34;https://stack.jimmycai.com/writing/shortcodes&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;documentation&lt;/a&gt;.&lt;/p&gt;
 &lt;h2 id=&#34;bilibili-video&#34;&gt;Bilibili video
 &lt;/h2&gt;
@@ -12568,10 +12810,10 @@ f[j]表示：拿了总体积不超过j的物品，最大总价值。&lt;/p&gt;
         </item>
         <item>
         <title>Math Typesetting</title>
-        <link>https://demo.stack.jimmycai.com/p/math-typesetting/</link>
+        <link>http://localhost:1313/p/math-typesetting/</link>
         <pubDate>Thu, 24 Aug 2023 00:00:00 +0000</pubDate>
         
-        <guid>https://demo.stack.jimmycai.com/p/math-typesetting/</guid>
+        <guid>http://localhost:1313/p/math-typesetting/</guid>
         <description>&lt;p&gt;Stack has built-in support for math typesetting using &lt;a class=&#34;link&#34; href=&#34;https://katex.org/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;KaTeX&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;It&amp;rsquo;s not enabled by default side-wide,&lt;/strong&gt; but you can enable it for individual posts by adding &lt;code&gt;math: true&lt;/code&gt; to the front matter. Or you can enable it side-wide by adding &lt;code&gt;math = true&lt;/code&gt; to the &lt;code&gt;params.article&lt;/code&gt; section in &lt;code&gt;config.toml&lt;/code&gt;.&lt;/p&gt;
@@ -12620,18 +12862,18 @@ $$&lt;/p&gt;
         </item>
         <item>
         <title>Archives</title>
-        <link>https://demo.stack.jimmycai.com/archives/</link>
+        <link>http://localhost:1313/archives/</link>
         <pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate>
         
-        <guid>https://demo.stack.jimmycai.com/archives/</guid>
+        <guid>http://localhost:1313/archives/</guid>
         <description></description>
         </item>
         <item>
         <title>Links</title>
-        <link>https://demo.stack.jimmycai.com/links/</link>
+        <link>http://localhost:1313/links/</link>
         <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
-        <guid>https://demo.stack.jimmycai.com/links/</guid>
+        <guid>http://localhost:1313/links/</guid>
         <description>&lt;p&gt;To use this feature, add &lt;code&gt;links&lt;/code&gt; section to frontmatter.&lt;/p&gt;
 &lt;p&gt;This page&amp;rsquo;s frontmatter:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
@@ -12663,10 +12905,10 @@ $$&lt;/p&gt;
         </item>
         <item>
         <title>Search</title>
-        <link>https://demo.stack.jimmycai.com/search/</link>
+        <link>http://localhost:1313/search/</link>
         <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
-        <guid>https://demo.stack.jimmycai.com/search/</guid>
+        <guid>http://localhost:1313/search/</guid>
         <description></description>
         </item>
         

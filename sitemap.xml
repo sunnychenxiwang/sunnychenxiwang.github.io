@@ -2,89 +2,92 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://demo.stack.jimmycai.com/p/hello-world/</loc>
+    <loc>http://localhost:1313/p/hello-world/</loc>
     <lastmod>2022-03-06T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/</loc>
+    <loc>http://localhost:1313/</loc>
+    <lastmod>2025-03-03T17:58:03+08:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/post/</loc>
+    <lastmod>2025-03-03T17:58:03+08:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/p/%E5%B9%BB%E8%A7%89/</loc>
+    <lastmod>2025-03-03T17:58:03+08:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/p/min-p-%E9%87%87%E6%A0%B7/</loc>
     <lastmod>2024-10-27T22:11:17+08:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/p/min-p-%E9%87%87%E6%A0%B7/</loc>
-    <lastmod>2024-10-27T22:11:17+08:00</lastmod>
-  </url><url>
-    <loc>https://demo.stack.jimmycai.com/post/</loc>
-    <lastmod>2024-10-27T22:11:17+08:00</lastmod>
-  </url><url>
-    <loc>https://demo.stack.jimmycai.com/p/kv-cache/</loc>
+    <loc>http://localhost:1313/p/kv-cache/</loc>
     <lastmod>2024-09-16T10:25:56+08:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/p/beam-search%E5%AE%9E%E7%8E%B0/</loc>
+    <loc>http://localhost:1313/p/beam-search%E5%AE%9E%E7%8E%B0/</loc>
     <lastmod>2024-08-18T10:11:38+08:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/p/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%9F%BA%E7%A1%80/</loc>
+    <loc>http://localhost:1313/p/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%9F%BA%E7%A1%80/</loc>
     <lastmod>2024-08-16T20:36:47+08:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/p/%E7%BD%91%E7%BB%9C%E6%8A%93%E5%8C%85/</loc>
+    <loc>http://localhost:1313/p/%E7%BD%91%E7%BB%9C%E6%8A%93%E5%8C%85/</loc>
     <lastmod>2024-08-16T20:36:34+08:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/</loc>
+    <loc>http://localhost:1313/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/</loc>
     <lastmod>2024-08-16T20:33:39+08:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/p/%E6%8A%95%E6%9C%BA%E9%87%87%E6%A0%B7/</loc>
+    <loc>http://localhost:1313/p/%E6%8A%95%E6%9C%BA%E9%87%87%E6%A0%B7/</loc>
     <lastmod>2024-08-16T20:31:49+08:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/p/flash-attention/</loc>
+    <loc>http://localhost:1313/p/flash-attention/</loc>
     <lastmod>2024-08-16T20:31:19+08:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/categories/</loc>
+    <loc>http://localhost:1313/categories/</loc>
     <lastmod>2023-09-07T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/tags/css/</loc>
+    <loc>http://localhost:1313/tags/css/</loc>
     <lastmod>2023-09-07T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/tags/html/</loc>
+    <loc>http://localhost:1313/tags/html/</loc>
     <lastmod>2023-09-07T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/tags/markdown/</loc>
+    <loc>http://localhost:1313/tags/markdown/</loc>
     <lastmod>2023-09-07T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/p/markdown-syntax-guide/</loc>
+    <loc>http://localhost:1313/p/markdown-syntax-guide/</loc>
     <lastmod>2023-09-07T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/categories/syntax/</loc>
+    <loc>http://localhost:1313/categories/syntax/</loc>
     <lastmod>2023-09-07T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/tags/</loc>
+    <loc>http://localhost:1313/tags/</loc>
     <lastmod>2023-09-07T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/tags/themes/</loc>
+    <loc>http://localhost:1313/tags/themes/</loc>
     <lastmod>2023-09-07T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/categories/themes/</loc>
+    <loc>http://localhost:1313/categories/themes/</loc>
     <lastmod>2023-09-07T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/p/image-gallery/</loc>
+    <loc>http://localhost:1313/p/image-gallery/</loc>
     <lastmod>2023-08-26T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/p/shortcodes/</loc>
+    <loc>http://localhost:1313/p/shortcodes/</loc>
     <lastmod>2023-08-25T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/p/math-typesetting/</loc>
+    <loc>http://localhost:1313/p/math-typesetting/</loc>
     <lastmod>2023-08-24T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/archives/</loc>
+    <loc>http://localhost:1313/archives/</loc>
     <lastmod>2022-03-06T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/categories/example-category/</loc>
+    <loc>http://localhost:1313/categories/example-category/</loc>
     <lastmod>2022-03-06T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/tags/example-tag/</loc>
+    <loc>http://localhost:1313/tags/example-tag/</loc>
     <lastmod>2022-03-06T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/page/</loc>
+    <loc>http://localhost:1313/page/</loc>
     <lastmod>2022-03-06T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/links/</loc>
+    <loc>http://localhost:1313/links/</loc>
   </url><url>
-    <loc>https://demo.stack.jimmycai.com/search/</loc>
+    <loc>http://localhost:1313/search/</loc>
   </url>
 </urlset>

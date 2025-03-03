@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en-us" dir="ltr">
-    <head><meta charset='utf-8'>
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="自然语言处理基础 主要根据cs224n做笔记，动手学深度学习为辅 参考资源 http://web.stanford.edu/class/cs224n/：课件、作业、附件阅读资料 https://showmeai.tech/article-detail/235 https://github.com/Yiming-Wange/CS224n-2023-solution WordVec 如何在计算机表达词的意义 WordNet：构建一个包含同义词集和上位词（从属关系，动物是“狗”、“猫”、“鸟”等具体动物的上位词）的列表的辞典。问题：1）忽略词汇的细微差别，也不能定量计算单词的相似性。2）难以持续更新。3）由人工构建，带有主观性以及成本高 1 WordNet是一个词汇数据库，记录了单词之间的语义关系，包括同义词、下义词和部分义词等语义关联。同义词被组织成同义词集，配有简短的定义和使用示例。它可以被看作是字典和词典的结合和延伸。虽然可以通过网络浏览器访问，但其主要用途是用于自动文本分析和人工智能应用。最初是用英语创建的，英语WordNet数据库和软件工具以BSD风格许可证发布，并可从WordNet网站免费下载。现在已经有200多种语言的WordNet。 1 2 3 4 5 6 7 8 9 10 11 # 同义词集 from nltk.corpus import wordnet as wn poses = { &#39;n&#39;:&#39;noun&#39;, &#39;v&#39;:&#39;verb&#39;, &#39;s&#39;:&#39;adj (s)&#39;, &#39;a&#39;:&#39;adj&#39;, &#39;r&#39;:&#39;adv&#39;} for synset in wn.synsets(&#34;good&#34;): print(&#34;{}: {}&#34;.format(poses[synset.pos()], &#34;, &#34;.join([l.name() for l in synset.lemmas()]))) # 上位词 from nltk.corpus import wordnet as wn panda = wn.synset(&#34;panda.n.01&#34;) hyper = lambda s: s.hypernyms() list(panda.closure(hyper)) 词汇的离散表征：将每个词语看作单独离散的符号，并把单词表征为独热编码。问题：1）每个词向量之间正交不能很好的建模单词之间的相似性。2）向量维度大，每增加一个单词就增加一个维度。解决方案：通过大量数据学习词向量本身相似性，获得更精确的稠密词向量编码 基于上下文词汇表征。核心思想：一个单词的意思是由经常出现在它附近的单词给出的。方法：当一个单词w出现在文本中时，它的上下文是出现在其附近的一组单词（在一个固定大小的窗口中）。基于海量数据，使用w的许多上下文来构建w的表示">
 <title>自然语言处理基础</title>
 
-<link rel='canonical' href='https://demo.stack.jimmycai.com/p/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%9F%BA%E7%A1%80/'>
+<link rel='canonical' href='http://localhost:1313/p/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%9F%BA%E7%A1%80/'>
 
 <link rel="stylesheet" href="/scss/style.min.0304c6baf04e01a8fe70693791cb744d56a3578a3120a8796cefc66825aa39c7.css"><meta property='og:title' content="自然语言处理基础">
 <meta property='og:description' content="自然语言处理基础 主要根据cs224n做笔记，动手学深度学习为辅 参考资源 http://web.stanford.edu/class/cs224n/：课件、作业、附件阅读资料 https://showmeai.tech/article-detail/235 https://github.com/Yiming-Wange/CS224n-2023-solution WordVec 如何在计算机表达词的意义 WordNet：构建一个包含同义词集和上位词（从属关系，动物是“狗”、“猫”、“鸟”等具体动物的上位词）的列表的辞典。问题：1）忽略词汇的细微差别，也不能定量计算单词的相似性。2）难以持续更新。3）由人工构建，带有主观性以及成本高 1 WordNet是一个词汇数据库，记录了单词之间的语义关系，包括同义词、下义词和部分义词等语义关联。同义词被组织成同义词集，配有简短的定义和使用示例。它可以被看作是字典和词典的结合和延伸。虽然可以通过网络浏览器访问，但其主要用途是用于自动文本分析和人工智能应用。最初是用英语创建的，英语WordNet数据库和软件工具以BSD风格许可证发布，并可从WordNet网站免费下载。现在已经有200多种语言的WordNet。 1 2 3 4 5 6 7 8 9 10 11 # 同义词集 from nltk.corpus import wordnet as wn poses = { &#39;n&#39;:&#39;noun&#39;, &#39;v&#39;:&#39;verb&#39;, &#39;s&#39;:&#39;adj (s)&#39;, &#39;a&#39;:&#39;adj&#39;, &#39;r&#39;:&#39;adv&#39;} for synset in wn.synsets(&#34;good&#34;): print(&#34;{}: {}&#34;.format(poses[synset.pos()], &#34;, &#34;.join([l.name() for l in synset.lemmas()]))) # 上位词 from nltk.corpus import wordnet as wn panda = wn.synset(&#34;panda.n.01&#34;) hyper = lambda s: s.hypernyms() list(panda.closure(hyper)) 词汇的离散表征：将每个词语看作单独离散的符号，并把单词表征为独热编码。问题：1）每个词向量之间正交不能很好的建模单词之间的相似性。2）向量维度大，每增加一个单词就增加一个维度。解决方案：通过大量数据学习词向量本身相似性，获得更精确的稠密词向量编码 基于上下文词汇表征。核心思想：一个单词的意思是由经常出现在它附近的单词给出的。方法：当一个单词w出现在文本中时，它的上下文是出现在其附近的一组单词（在一个固定大小的窗口中）。基于海量数据，使用w的许多上下文来构建w的表示">
-<meta property='og:url' content='https://demo.stack.jimmycai.com/p/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%9F%BA%E7%A1%80/'>
+<meta property='og:url' content='http://localhost:1313/p/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E5%9F%BA%E7%A1%80/'>
 <meta property='og:site_name' content='Hugo Theme Stack Starter'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-08-16T20:36:47&#43;08:00'/><meta property='article:modified_time' content='2024-08-16T20:36:47&#43;08:00'/>
 <meta name="twitter:title" content="自然语言处理基础">
@@ -1968,7 +1968,7 @@ $$
         
             2020 - 
         
-        2024 Hugo Theme Stack Starter
+        2025 Hugo Theme Stack Starter
     </section>
     
     <section class="powerby">

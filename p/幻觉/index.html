@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="终极目标都是为了向可信大模型发展，尽管推理模型的出现极大的缓解了面向结果的幻觉，然而新的幻觉问题也出现了！ 幻觉 幻觉综述/博客 Extrinsic Hallucinations in LLMs 链接地址：https://lilianweng.github.io/posts/2024-07-07-hallucination/ 幻觉定义：Hallucination in large language models usually refers to the model generating unfaithful, fabricated, inconsistent, or nonsensical content。分类：（1）上下文幻觉（in-context hallucination）：模型输出应该与上下文中的源内容一致（2）外在幻觉（extrinsic hallucination）：模型的输出应与外部世界知识一致，当他不知道时应当承认不知道。 导致幻觉的原因： Pre-training Data Issues：大量的预训练数据作为外部世界知识的代表。这些数据往往来自公共互联网，因此会出现过时、缺失或错误的信息。由于模型可能仅通过最大化对数似然来错误记住这些信息，我们可以预期模型会犯错。 Fine-tuning New Knowledge：论文（Does Fine-Tuning LLMs on New Knowledge Encourage Hallucinations?）表示用新知识微调LLM可能会鼓励其生成幻觉：（1）LLM学习包含新知识的微调数据比学习与模型已有知识一致的数据速度更慢（2） 一旦这些包含新知识的示例被最终学习到，它们会增加模型产生幻觉的倾向。 Hallucination Detection： Retrieval-Augmented Evaluation：基于检索增强的幻觉评估 FactualityPrompt：主要使用两种幻觉评估指标（1）Hallucination NE (Named Entity) errors：使用实体抽取模型抽取回应中的实体检测是否出现在真值文档（2）Entailment ratios:使用预训练模型roberta判断claim是否和wiki真值数据有关联。 FActScore：将长篇拆分为原子事实（claim），使用wiki检索来判断是否是幻觉。方法为使用检索+Nonparametric Masked Language Modeling的检测效果最佳。一些发现：在传记生成任务中，罕见的实体的错误率较高。 生成靠后面的token提到的事实的错误率较高。 使用检索来为模型生成提供依据显著有助于减少幻觉。 SAFE： FacTool： Sampling-Based Detection SelfCheckGPT： Calibration of Unknown Knowledge Indirect Query Anti-Hallucination Methods： RAG → Edits and Attribution Chain of Actions Sampling Methods Fine-tuning for Factuality Fine-tuning for Attribution WebGPT： GopherCite： Evaluation Benchmarks TruthfulQA、FactualityPrompt、SelfAware、LongFact、HaDes、FEVER、FAVABench 幻觉数据集构建 多模态幻觉Benchmark POPE 提出了评估LVLM中的Object幻觉方法，Polling-based Object Probing Evaluation 评估目标幻觉的挑战：解析生成的描述来提取目标需要工设计复杂的规则，仍然难以避免遗漏或错误分类对象 核心思想：将幻觉评估转换成二元分类任务（但被HaELM验证，这和LVLM在真实使用场景下，即输出response中的幻觉评估结果没有必然联系），询问的目标包含三种类型：随机目标、频繁目标、对抗目标（选取前k个与真实目标共现频率最大的目标） 构建方法：人工或使用自动分割工具SEEM提取真实对象，再按策略负采样出三种类型的目标 缺陷：1）仅关注了目标幻觉，没有考虑LVLM的其他方面的性能。2）提示存在的偏差会影响评估结果 HaELM 提出了基于LLM的幻觉评估方法，收集幻觉和非幻觉数据微调LLAMA 幻觉数据构建方法：提示ChatGPT，通过参考标题生成幻觉数据 缺陷：仅使用LLM来判断LVLM中幻觉，不靠谱。 LRV 解决的问题：使MLLM遵循指令、缓解幻觉（主要关注目标和属性） 指令数据集构建：1）Positive视觉指令：提示GPT4生成指令（包含提问和对应的答案），覆盖16个视觉-文本任务。2）Negative视觉指令：提示GPT4生成有关不存在的目标，错误的属性等指令并生成答案 模型微调：微调MiniGPT4（仅训练线性投影层）和Mplug-owl（冻结视觉，微调LLM） 评估方法（GAVIE）：通过提示GPT4，比较人类输入指令以及MLLM输出，进行打分。主要衡量相关性（响应是否直接遵循指令），准确性（是否出现幻觉） 结果分析：1）幻觉成因：当前MLLM的训练数据缺少负面指令数据。2）属性比目标更具有挑战性，需要更强的视觉编码器 Bingo 构建了一些特殊的case，用于分析GPT4V幻觉 幻觉分类：偏差（区域、OCR、事实）、干扰（图像到图像、文本到图像） 结果分析：1）区域偏差：面对西方图像的性能比东亚效果更好。2）OCR偏差：面对英语的OCR能力比中文强。3）事实偏差：当输入包含反事实知识的图像，即输入图像与所学事实知识冲突时，性能较差。4）图像到图像干扰：输入相似图像干扰能力。5）文本到图像干扰：人类输入文本干扰能力 如何减少幻觉：引入Self-Correction或CoT可以减少幻觉（提示词参考原文），Self-Correction减轻幻觉的效果最好，CoT效果有限（考虑能否加入样例，能提升效果）。总之，二者效果均有限 AMBER 一个免LLM的幻觉检测方法：基于语言工具包NLTK、Spacy，提取输出的目标、近义词等，再根据注释的标签进行幻觉评估 任务分类：生成式、判别式 数据集构建：判别式任务标注二分类标签，生成式任务不需标注（仅让MLLM生成输出即可） 局限：生成任务仅能检测目标幻觉，属性、关系等不能检测 幻觉评估、修正、检测方法 基于工具增强 Factool 面向文本任务的单模态幻觉检测，包括：知识问答、代码生成、数学问题、文献写作 基座（GPT3.">
+<title>幻觉</title>
+
+<link rel='canonical' href='http://localhost:1313/p/%E5%B9%BB%E8%A7%89/'>
+
+<link rel="stylesheet" href="/scss/style.min.0304c6baf04e01a8fe70693791cb744d56a3578a3120a8796cefc66825aa39c7.css"><meta property='og:title' content="幻觉">
+<meta property='og:description' content="终极目标都是为了向可信大模型发展，尽管推理模型的出现极大的缓解了面向结果的幻觉，然而新的幻觉问题也出现了！ 幻觉 幻觉综述/博客 Extrinsic Hallucinations in LLMs 链接地址：https://lilianweng.github.io/posts/2024-07-07-hallucination/ 幻觉定义：Hallucination in large language models usually refers to the model generating unfaithful, fabricated, inconsistent, or nonsensical content。分类：（1）上下文幻觉（in-context hallucination）：模型输出应该与上下文中的源内容一致（2）外在幻觉（extrinsic hallucination）：模型的输出应与外部世界知识一致，当他不知道时应当承认不知道。 导致幻觉的原因： Pre-training Data Issues：大量的预训练数据作为外部世界知识的代表。这些数据往往来自公共互联网，因此会出现过时、缺失或错误的信息。由于模型可能仅通过最大化对数似然来错误记住这些信息，我们可以预期模型会犯错。 Fine-tuning New Knowledge：论文（Does Fine-Tuning LLMs on New Knowledge Encourage Hallucinations?）表示用新知识微调LLM可能会鼓励其生成幻觉：（1）LLM学习包含新知识的微调数据比学习与模型已有知识一致的数据速度更慢（2） 一旦这些包含新知识的示例被最终学习到，它们会增加模型产生幻觉的倾向。 Hallucination Detection： Retrieval-Augmented Evaluation：基于检索增强的幻觉评估 FactualityPrompt：主要使用两种幻觉评估指标（1）Hallucination NE (Named Entity) errors：使用实体抽取模型抽取回应中的实体检测是否出现在真值文档（2）Entailment ratios:使用预训练模型roberta判断claim是否和wiki真值数据有关联。 FActScore：将长篇拆分为原子事实（claim），使用wiki检索来判断是否是幻觉。方法为使用检索+Nonparametric Masked Language Modeling的检测效果最佳。一些发现：在传记生成任务中，罕见的实体的错误率较高。 生成靠后面的token提到的事实的错误率较高。 使用检索来为模型生成提供依据显著有助于减少幻觉。 SAFE： FacTool： Sampling-Based Detection SelfCheckGPT： Calibration of Unknown Knowledge Indirect Query Anti-Hallucination Methods： RAG → Edits and Attribution Chain of Actions Sampling Methods Fine-tuning for Factuality Fine-tuning for Attribution WebGPT： GopherCite： Evaluation Benchmarks TruthfulQA、FactualityPrompt、SelfAware、LongFact、HaDes、FEVER、FAVABench 幻觉数据集构建 多模态幻觉Benchmark POPE 提出了评估LVLM中的Object幻觉方法，Polling-based Object Probing Evaluation 评估目标幻觉的挑战：解析生成的描述来提取目标需要工设计复杂的规则，仍然难以避免遗漏或错误分类对象 核心思想：将幻觉评估转换成二元分类任务（但被HaELM验证，这和LVLM在真实使用场景下，即输出response中的幻觉评估结果没有必然联系），询问的目标包含三种类型：随机目标、频繁目标、对抗目标（选取前k个与真实目标共现频率最大的目标） 构建方法：人工或使用自动分割工具SEEM提取真实对象，再按策略负采样出三种类型的目标 缺陷：1）仅关注了目标幻觉，没有考虑LVLM的其他方面的性能。2）提示存在的偏差会影响评估结果 HaELM 提出了基于LLM的幻觉评估方法，收集幻觉和非幻觉数据微调LLAMA 幻觉数据构建方法：提示ChatGPT，通过参考标题生成幻觉数据 缺陷：仅使用LLM来判断LVLM中幻觉，不靠谱。 LRV 解决的问题：使MLLM遵循指令、缓解幻觉（主要关注目标和属性） 指令数据集构建：1）Positive视觉指令：提示GPT4生成指令（包含提问和对应的答案），覆盖16个视觉-文本任务。2）Negative视觉指令：提示GPT4生成有关不存在的目标，错误的属性等指令并生成答案 模型微调：微调MiniGPT4（仅训练线性投影层）和Mplug-owl（冻结视觉，微调LLM） 评估方法（GAVIE）：通过提示GPT4，比较人类输入指令以及MLLM输出，进行打分。主要衡量相关性（响应是否直接遵循指令），准确性（是否出现幻觉） 结果分析：1）幻觉成因：当前MLLM的训练数据缺少负面指令数据。2）属性比目标更具有挑战性，需要更强的视觉编码器 Bingo 构建了一些特殊的case，用于分析GPT4V幻觉 幻觉分类：偏差（区域、OCR、事实）、干扰（图像到图像、文本到图像） 结果分析：1）区域偏差：面对西方图像的性能比东亚效果更好。2）OCR偏差：面对英语的OCR能力比中文强。3）事实偏差：当输入包含反事实知识的图像，即输入图像与所学事实知识冲突时，性能较差。4）图像到图像干扰：输入相似图像干扰能力。5）文本到图像干扰：人类输入文本干扰能力 如何减少幻觉：引入Self-Correction或CoT可以减少幻觉（提示词参考原文），Self-Correction减轻幻觉的效果最好，CoT效果有限（考虑能否加入样例，能提升效果）。总之，二者效果均有限 AMBER 一个免LLM的幻觉检测方法：基于语言工具包NLTK、Spacy，提取输出的目标、近义词等，再根据注释的标签进行幻觉评估 任务分类：生成式、判别式 数据集构建：判别式任务标注二分类标签，生成式任务不需标注（仅让MLLM生成输出即可） 局限：生成任务仅能检测目标幻觉，属性、关系等不能检测 幻觉评估、修正、检测方法 基于工具增强 Factool 面向文本任务的单模态幻觉检测，包括：知识问答、代码生成、数学问题、文献写作 基座（GPT3.">
+<meta property='og:url' content='http://localhost:1313/p/%E5%B9%BB%E8%A7%89/'>
+<meta property='og:site_name' content='Hugo Theme Stack Starter'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-03-03T17:58:03&#43;08:00'/><meta property='article:modified_time' content='2025-03-03T17:58:03&#43;08:00'/>
+<meta name="twitter:title" content="幻觉">
+<meta name="twitter:description" content="终极目标都是为了向可信大模型发展，尽管推理模型的出现极大的缓解了面向结果的幻觉，然而新的幻觉问题也出现了！ 幻觉 幻觉综述/博客 Extrinsic Hallucinations in LLMs 链接地址：https://lilianweng.github.io/posts/2024-07-07-hallucination/ 幻觉定义：Hallucination in large language models usually refers to the model generating unfaithful, fabricated, inconsistent, or nonsensical content。分类：（1）上下文幻觉（in-context hallucination）：模型输出应该与上下文中的源内容一致（2）外在幻觉（extrinsic hallucination）：模型的输出应与外部世界知识一致，当他不知道时应当承认不知道。 导致幻觉的原因： Pre-training Data Issues：大量的预训练数据作为外部世界知识的代表。这些数据往往来自公共互联网，因此会出现过时、缺失或错误的信息。由于模型可能仅通过最大化对数似然来错误记住这些信息，我们可以预期模型会犯错。 Fine-tuning New Knowledge：论文（Does Fine-Tuning LLMs on New Knowledge Encourage Hallucinations?）表示用新知识微调LLM可能会鼓励其生成幻觉：（1）LLM学习包含新知识的微调数据比学习与模型已有知识一致的数据速度更慢（2） 一旦这些包含新知识的示例被最终学习到，它们会增加模型产生幻觉的倾向。 Hallucination Detection： Retrieval-Augmented Evaluation：基于检索增强的幻觉评估 FactualityPrompt：主要使用两种幻觉评估指标（1）Hallucination NE (Named Entity) errors：使用实体抽取模型抽取回应中的实体检测是否出现在真值文档（2）Entailment ratios:使用预训练模型roberta判断claim是否和wiki真值数据有关联。 FActScore：将长篇拆分为原子事实（claim），使用wiki检索来判断是否是幻觉。方法为使用检索+Nonparametric Masked Language Modeling的检测效果最佳。一些发现：在传记生成任务中，罕见的实体的错误率较高。 生成靠后面的token提到的事实的错误率较高。 使用检索来为模型生成提供依据显著有助于减少幻觉。 SAFE： FacTool： Sampling-Based Detection SelfCheckGPT： Calibration of Unknown Knowledge Indirect Query Anti-Hallucination Methods： RAG → Edits and Attribution Chain of Actions Sampling Methods Fine-tuning for Factuality Fine-tuning for Attribution WebGPT： GopherCite： Evaluation Benchmarks TruthfulQA、FactualityPrompt、SelfAware、LongFact、HaDes、FEVER、FAVABench 幻觉数据集构建 多模态幻觉Benchmark POPE 提出了评估LVLM中的Object幻觉方法，Polling-based Object Probing Evaluation 评估目标幻觉的挑战：解析生成的描述来提取目标需要工设计复杂的规则，仍然难以避免遗漏或错误分类对象 核心思想：将幻觉评估转换成二元分类任务（但被HaELM验证，这和LVLM在真实使用场景下，即输出response中的幻觉评估结果没有必然联系），询问的目标包含三种类型：随机目标、频繁目标、对抗目标（选取前k个与真实目标共现频率最大的目标） 构建方法：人工或使用自动分割工具SEEM提取真实对象，再按策略负采样出三种类型的目标 缺陷：1）仅关注了目标幻觉，没有考虑LVLM的其他方面的性能。2）提示存在的偏差会影响评估结果 HaELM 提出了基于LLM的幻觉评估方法，收集幻觉和非幻觉数据微调LLAMA 幻觉数据构建方法：提示ChatGPT，通过参考标题生成幻觉数据 缺陷：仅使用LLM来判断LVLM中幻觉，不靠谱。 LRV 解决的问题：使MLLM遵循指令、缓解幻觉（主要关注目标和属性） 指令数据集构建：1）Positive视觉指令：提示GPT4生成指令（包含提问和对应的答案），覆盖16个视觉-文本任务。2）Negative视觉指令：提示GPT4生成有关不存在的目标，错误的属性等指令并生成答案 模型微调：微调MiniGPT4（仅训练线性投影层）和Mplug-owl（冻结视觉，微调LLM） 评估方法（GAVIE）：通过提示GPT4，比较人类输入指令以及MLLM输出，进行打分。主要衡量相关性（响应是否直接遵循指令），准确性（是否出现幻觉） 结果分析：1）幻觉成因：当前MLLM的训练数据缺少负面指令数据。2）属性比目标更具有挑战性，需要更强的视觉编码器 Bingo 构建了一些特殊的case，用于分析GPT4V幻觉 幻觉分类：偏差（区域、OCR、事实）、干扰（图像到图像、文本到图像） 结果分析：1）区域偏差：面对西方图像的性能比东亚效果更好。2）OCR偏差：面对英语的OCR能力比中文强。3）事实偏差：当输入包含反事实知识的图像，即输入图像与所学事实知识冲突时，性能较差。4）图像到图像干扰：输入相似图像干扰能力。5）文本到图像干扰：人类输入文本干扰能力 如何减少幻觉：引入Self-Correction或CoT可以减少幻觉（提示词参考原文），Self-Correction减轻幻觉的效果最好，CoT效果有限（考虑能否加入样例，能提升效果）。总之，二者效果均有限 AMBER 一个免LLM的幻觉检测方法：基于语言工具包NLTK、Spacy，提取输出的目标、近义词等，再根据注释的标签进行幻觉评估 任务分类：生成式、判别式 数据集构建：判别式任务标注二分类标签，生成式任务不需标注（仅让MLLM生成输出即可） 局限：生成任务仅能检测目标幻觉，属性、关系等不能检测 幻觉评估、修正、检测方法 基于工具增强 Factool 面向文本任务的单模态幻觉检测，包括：知识问答、代码生成、数学问题、文献写作 基座（GPT3.">
+    <link rel="shortcut icon" href="/favicon.png" />
+
+  
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu897059592634026878.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Hugo Theme Stack Starter</a></h1>
+            <h2 class="site-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#幻觉综述博客">幻觉综述/博客</a></li>
+    <li><a href="#幻觉数据集构建">幻觉数据集构建</a>
+      <ol>
+        <li><a href="#多模态幻觉benchmark">多模态幻觉Benchmark</a></li>
+      </ol>
+    </li>
+    <li><a href="#幻觉评估修正检测方法">幻觉评估、修正、检测方法</a>
+      <ol>
+        <li><a href="#基于工具增强">基于工具增强</a></li>
+        <li><a href="#模型训练">模型训练</a></li>
+      </ol>
+    </li>
+    <li><a href="#语言模型幻觉">语言模型幻觉</a></li>
+    <li><a href="#多模态幻觉">多模态幻觉</a></li>
+    <li><a href="#幻觉机理">幻觉机理</a>
+      <ol>
+        <li><a href="#基于内部表征的幻觉机理">基于内部表征的幻觉机理</a></li>
+        <li><a href="#基于不确定性的幻觉机理">基于不确定性的幻觉机理</a></li>
+        <li><a href="#基于后处理的幻觉机理">基于后处理的幻觉机理</a></li>
+        <li><a href="#其他">其他</a></li>
+      </ol>
+    </li>
+    <li><a href="#幻觉评估">幻觉评估</a></li>
+  </ol>
+
+  <ol>
+    <li><a href="#简介">简介</a></li>
+    <li><a href="#大型视觉-语言模型中幻觉的评估与分析">大型视觉-语言模型中幻觉的评估与分析</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E5%B9%BB%E8%A7%89/">幻觉</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 03, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    2 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>终极目标都是为了向可信大模型发展，尽管推理模型的出现极大的缓解了面向结果的幻觉，然而新的幻觉问题也出现了！</p>
+<h1 id="幻觉">幻觉
+</h1><h2 id="幻觉综述博客">幻觉综述/博客
+</h2><p>Extrinsic Hallucinations in LLMs</p>
+<ul>
+<li>链接地址：https://lilianweng.github.io/posts/2024-07-07-hallucination/</li>
+<li>幻觉定义：Hallucination in large language models usually refers to the model generating unfaithful, fabricated, inconsistent, or nonsensical content。分类：（1）上下文幻觉（in-context hallucination）：模型输出应该与上下文中的源内容一致（2）外在幻觉（extrinsic hallucination）：模型的输出应与外部世界知识一致，当他不知道时应当承认不知道。</li>
+<li>导致幻觉的原因：
+<ul>
+<li>Pre-training Data Issues：大量的预训练数据作为外部世界知识的代表。这些数据往往来自公共互联网，因此会出现过时、缺失或错误的信息。由于模型可能仅通过最大化对数似然来错误记住这些信息，我们可以预期模型会犯错。</li>
+<li>Fine-tuning New Knowledge：<a class="link" href="https://arxiv.org/pdf/2405.05904"  target="_blank" rel="noopener"
+    >论文（Does Fine-Tuning LLMs on New Knowledge Encourage Hallucinations?）</a>表示用新知识微调LLM可能会鼓励其生成幻觉：（1）LLM学习包含新知识的微调数据比学习与模型已有知识一致的数据速度更慢（2） 一旦这些包含新知识的示例被最终学习到，它们会增加模型产生幻觉的倾向。</li>
+</ul>
+</li>
+<li>Hallucination Detection：
+<ul>
+<li>
+<p>Retrieval-Augmented Evaluation：基于检索增强的幻觉评估</p>
+<ul>
+<li><a class="link" href="https://arxiv.org/abs/2206.04624"  target="_blank" rel="noopener"
+    ><strong>FactualityPrompt</strong></a>：主要使用两种幻觉评估指标（1）Hallucination NE (Named Entity) errors：使用实体抽取模型抽取回应中的实体检测是否出现在真值文档（2）Entailment ratios:使用预训练模型roberta判断claim是否和wiki真值数据有关联。</li>
+<li><strong><a class="link" href="https://arxiv.org/abs/2305.14251"  target="_blank" rel="noopener"
+    >FActScore</a></strong>：将长篇拆分为原子事实（claim），使用wiki检索来判断是否是幻觉。方法为使用检索+Nonparametric Masked Language Modeling的检测效果最佳。一些发现：在传记生成任务中，罕见的实体的错误率较高。 生成靠后面的token提到的事实的错误率较高。 使用检索来为模型生成提供依据显著有助于减少幻觉。</li>
+<li><strong>SAFE</strong>：</li>
+<li><strong>FacTool</strong>：</li>
+</ul>
+</li>
+<li>
+<p>Sampling-Based Detection</p>
+<ul>
+<li><strong>SelfCheckGPT</strong>：</li>
+</ul>
+</li>
+<li>
+<p>Calibration of Unknown Knowledge</p>
+</li>
+<li>
+<p>Indirect Query</p>
+</li>
+</ul>
+</li>
+<li>Anti-Hallucination Methods：
+<ul>
+<li>RAG → Edits and Attribution</li>
+<li>Chain of Actions</li>
+<li>Sampling Methods</li>
+<li>Fine-tuning for Factuality</li>
+<li>Fine-tuning for Attribution
+<ul>
+<li><strong>WebGPT</strong>：</li>
+<li><strong>GopherCite</strong>：</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Evaluation Benchmarks
+<ul>
+<li><strong><a class="link" href="https://github.com/sylinrl/TruthfulQA"  target="_blank" rel="noopener"
+    >TruthfulQA</a></strong>、<a class="link" href="https://github.com/nayeon7lee/FactualityPrompt"  target="_blank" rel="noopener"
+    ><strong>FactualityPrompt</strong></a>、<a class="link" href="https://github.com/yinzhangyue/SelfAware"  target="_blank" rel="noopener"
+    ><strong>SelfAware</strong></a>、<a class="link" href="https://github.com/google-deepmind/long-form-factuality/tree/main/longfact"  target="_blank" rel="noopener"
+    ><strong>LongFact</strong></a>、<a class="link" href="https://github.com/microsoft/HaDes"  target="_blank" rel="noopener"
+    ><strong>HaDes</strong></a>、<a class="link" href="https://fever.ai/dataset/fever.html"  target="_blank" rel="noopener"
+    ><strong>FEVER</strong></a>、<a class="link" href="https://huggingface.co/datasets/fava-uw/fava-data"  target="_blank" rel="noopener"
+    ><strong>FAVABench</strong></a></li>
+</ul>
+</li>
+</ul>
+<h2 id="幻觉数据集构建">幻觉数据集构建
+</h2><h3 id="多模态幻觉benchmark">多模态幻觉Benchmark
+</h3><ul>
+<li>POPE
+<ul>
+<li>提出了评估LVLM中的Object幻觉方法，Polling-based Object Probing Evaluation</li>
+<li>评估目标幻觉的挑战：解析生成的描述来提取目标需要工设计复杂的规则，仍然难以避免遗漏或错误分类对象</li>
+<li>核心思想：将幻觉评估转换成二元分类任务（但被HaELM验证，这和LVLM在真实使用场景下，即输出response中的幻觉评估结果没有必然联系），询问的目标包含三种类型：随机目标、频繁目标、对抗目标（选取前k个与真实目标共现频率最大的目标）</li>
+<li>构建方法：人工或使用自动分割工具SEEM提取真实对象，再按策略负采样出三种类型的目标</li>
+<li>缺陷：1）仅关注了目标幻觉，没有考虑LVLM的其他方面的性能。2）提示存在的偏差会影响评估结果</li>
+</ul>
+</li>
+<li>HaELM
+<ul>
+<li>提出了基于LLM的幻觉评估方法，收集幻觉和非幻觉数据微调LLAMA</li>
+<li>幻觉数据构建方法：提示ChatGPT，通过参考标题生成幻觉数据</li>
+<li>缺陷：仅使用LLM来判断LVLM中幻觉，不靠谱。</li>
+</ul>
+</li>
+<li>LRV
+<ul>
+<li>解决的问题：使MLLM遵循指令、缓解幻觉（主要关注目标和属性）</li>
+<li>指令数据集构建：1）Positive视觉指令：提示GPT4生成指令（包含提问和对应的答案），覆盖16个视觉-文本任务。2）Negative视觉指令：提示GPT4生成有关不存在的目标，错误的属性等指令并生成答案</li>
+<li>模型微调：微调MiniGPT4（仅训练线性投影层）和Mplug-owl（冻结视觉，微调LLM）</li>
+<li>评估方法（GAVIE）：通过提示GPT4，比较人类输入指令以及MLLM输出，进行打分。主要衡量相关性（响应是否直接遵循指令），准确性（是否出现幻觉）</li>
+<li>结果分析：1）幻觉成因：当前MLLM的训练数据缺少负面指令数据。2）属性比目标更具有挑战性，需要更强的视觉编码器</li>
+</ul>
+</li>
+<li>Bingo
+<ul>
+<li>构建了一些特殊的case，用于分析GPT4V幻觉</li>
+<li>幻觉分类：偏差（区域、OCR、事实）、干扰（图像到图像、文本到图像）</li>
+<li>结果分析：1）区域偏差：面对西方图像的性能比东亚效果更好。2）OCR偏差：面对英语的OCR能力比中文强。3）事实偏差：当输入包含反事实知识的图像，即输入图像与所学事实知识冲突时，性能较差。4）图像到图像干扰：输入相似图像干扰能力。5）文本到图像干扰：人类输入文本干扰能力</li>
+<li>如何减少幻觉：引入Self-Correction或CoT可以减少幻觉（提示词参考原文），Self-Correction减轻幻觉的效果最好，CoT效果有限（考虑能否加入样例，能提升效果）。总之，二者效果均有限</li>
+</ul>
+</li>
+<li>AMBER
+<ul>
+<li>一个免LLM的幻觉检测方法：基于语言工具包NLTK、Spacy，提取输出的目标、近义词等，再根据注释的标签进行幻觉评估</li>
+<li>任务分类：生成式、判别式</li>
+<li>数据集构建：判别式任务标注二分类标签，生成式任务不需标注（仅让MLLM生成输出即可）</li>
+<li>局限：生成任务仅能检测目标幻觉，属性、关系等不能检测</li>
+</ul>
+</li>
+</ul>
+<h2 id="幻觉评估修正检测方法">幻觉评估、修正、检测方法
+</h2><h3 id="基于工具增强">基于工具增强
+</h3><ul>
+<li>Factool
+<ul>
+<li>面向文本任务的单模态幻觉检测，包括：知识问答、代码生成、数学问题、文献写作</li>
+<li>基座（GPT3.5）+工具（搜索引擎、Python解释器、计算器）</li>
+<li>Pipeline：声明抽取、问题生成（生成工具的输入形式）、工具执行、证据收集（汇集工具的输出形式）、最后的判断</li>
+</ul>
+</li>
+<li>Woodpecker
+<ul>
+<li>面向视觉-语言的多模态幻觉检测，包括：目标（是否存在、目标数量）、属性（颜色、位置、动作等）</li>
+<li>基座（GPT3.5）+工具（专家目标检测模型、视觉-语言）</li>
+<li>Pipeline：关键词抽取（生成目标检测模型的输入形式）、问题生成、工具执行、汇总证据并修正</li>
+</ul>
+</li>
+</ul>
+<h3 id="模型训练">模型训练
+</h3><p>模型训练（微调）：1）根本策略：调整训练MLLM的模型架构或者训练策略（如：LLAVA-RLHF、HACL），从根本上缓解MLLM的幻觉问题。2）直接策略：标注幻觉数据集，训练幻觉检测/评估模型</p>
+<ul>
+<li>LLAVA-RLHF</li>
+<li>HACL</li>
+<li>LRV
+<ul>
+<li>关注目标、属性、事实知识方面的幻觉</li>
+<li>负样本指令数据集构建：提示GPT4生成&lt;问题，答案&gt;，微调MLLM</li>
+<li>模型微调：微调MiniGPT4（仅训练线性投影层）和Mplug-owl（冻结视觉，微调LLM）</li>
+</ul>
+</li>
+<li>LURE
+<ul>
+<li>主要关注Object幻觉，同时分析了Object幻觉成因：共现、不确定性、在文本的位置</li>
+<li>幻觉训练/评估数据集构建：在正确的数据（LLAVA-150K）中，提示GPT加入幻觉信息（引入共现物体），将不确定性物体和靠文本位置后的物体用占位符替换（LVLM的操作）。Revisor的目标为原始干净数据，需去除共现物体，重新审视不确定性和位置靠后的物体。</li>
+<li>模型训练：通过幻觉数据集微调MiniGPT4（但通常说，这依然不靠谱，仍然需借助外部工具来判断）</li>
+<li>局限：1）仅关注了目标幻觉。2）推理时也需将LVLM输出替换不确定性物体和位置靠后的物体再将替换后的文本输入Revisor，对于一些没法获得不确定性token的情况，不奏效。</li>
+</ul>
+</li>
+</ul>
+<h2 id="语言模型幻觉">语言模型幻觉
+</h2><h2 id="多模态幻觉">多模态幻觉
+</h2><p>参考资源</p>
+<ul>
+<li>论文合集：https://github.com/showlab/Awesome-MLLM-Hallucination</li>
+</ul>
+<h2 id="幻觉机理">幻觉机理
+</h2><p>目前来看本质上单模态和多模态的幻觉机理是通用的，都是目前的注意力模式导致的信息流损失</p>
+<ul>
+<li>单模态：更关注一些Label anchor，可能会忽视重要信息</li>
+<li>多模态：token序列过长，浅层更关注视觉token，深层关注一些文本token（表现出LLM先验）</li>
+</ul>
+<p>整理结论（方法自己整理）</p>
+<h3 id="基于内部表征的幻觉机理">基于内部表征的幻觉机理
+</h3><ul>
+<li>The Internal State of an LLM Knows When It&rsquo;s Lying：面向事实性幻觉，内部表征训练分类器检测句子级是否是真实的。结论：使用较高层的表征效果更好，如20-28层（中间层偏后层）。</li>
+<li>INSIDE: LLMS&rsquo; INTERNAL STATES RETAIN THEPOWER OF HALLUCINATION DETECTION：面向语义方面的幻觉。比较了一些不确定性的方法（token-levels）<strong>（ICLR2024的工作在intro 和 related work引用了很多有关不确定性和知识边界的相关工作）</strong>。目前的相关工作针对于token-level以及language-level（即提示LLM输出使llm对同一问题生成多个响应，并评估这些响应的自一致性做幻觉检测），作者这里利用LLM的内部表征做语义的不确定性（幻觉检测）</li>
+<li>Discovering Latent Knowledge in Language Models Without Supervision：</li>
+<li>Unsupervised Real-Time Hallucination Detection based on the Internal States of Large Language Models：</li>
+<li>LLM Internal States Reveal Hallucination Risk Faced With a Query：</li>
+</ul>
+<h3 id="基于不确定性的幻觉机理">基于不确定性的幻觉机理
+</h3><h3 id="基于后处理的幻觉机理">基于后处理的幻觉机理
+</h3><p>通常指通过采样多条输出来判断一致性的方法，是一种language-level的检测手段</p>
+<ul>
+<li>Language Models (Mostly) Know What They Know：</li>
+</ul>
+<h3 id="其他">其他
+</h3><p>总结与思考</p>
+<ul>
+<li>
+<p>几乎所有工作都表明，最后一个token的中高层（32层LLaMA的20-28层）activation hidden representation 是最佳内部状态选择，在达到最佳效果的同时避免冗余。由于预训练所学的知识分布编码在模型参数中，而这些中高层的隐藏特征作为知识探针效果最好，所以大胆猜测，这个知识分布主要包含在这几层网络参数中，这也是很多知识编辑的工作都选择在中高层网络编辑的原因；相反越接近输出层的探针效果反而越不好，因此也可以猜测这几层参数主要负责将高维的空间分布“可视化”到人类文本的空间，损失部分信息。</p>
+<p>此外，大部分工作对内部状态的研究都是“横向”的，即只提取一层的状态观察效果或编辑，只有少量工作如Dola对不同层的状态进行纵向对比，“纵向”特征的变化包含着更丰富的过程信息，这也许对于探测模型的“思考过程”会更有帮助。</p>
+<p>大模型的内部状态是模型进行复杂任务的核心，它不仅存储和传递信息，还通过层次化的表征来生成最终输出，实现对复杂文本的真实性检测和理解等，总之这部分的研究上限还很高。</p>
+</li>
+<li></li>
+</ul>
+<h2 id="幻觉评估">幻觉评估
+</h2><p>现在的benchmark倾向于使用一种分数来评估，但是我们不是希望大模型欺骗出题人得到高分而是希望能真正检测到大模型的能力。</p>
+<p>比如常见的VQA，往往采用yes/no或者选择题的形式，同时为了便于评估还往往加入“请只用一个单词回答”。而经过指令微调后的大模型，往往倾向于给出一个回复（尽管可能不知道），这导致测出来的结果往往会比大模型的能力虚高。</p>
+<h1 id="不确定性">不确定性
+</h1><p>参考文章系列：</p>
+<ul>
+<li><a class="link" href="https://zhuanlan.zhihu.com/p/696065154"  target="_blank" rel="noopener"
+    >https://zhuanlan.zhihu.com/p/696065154</a></li>
+<li><a class="link" href="https://zhuanlan.zhihu.com/p/713737141"  target="_blank" rel="noopener"
+    >https://zhuanlan.zhihu.com/p/713737141</a></li>
+</ul>
+<h2 id="简介">简介
+</h2><p>参考《A Survey on Hallucination in Large Language Models》</p>
+<ul>
+<li>什么是大语言模型幻觉：大语言模型偶尔会生成与用户输入背道而驰，与先前生成的上下文相矛盾或与已确立的世界知识不符的内容。总之，指的是生成与提供的源内容不符合逻辑或不忠实的内容</li>
+<li>幻觉类型：<strong>Input-conflicting幻觉</strong>，即大型语言模型生成与用户提供的源输入不符的内容；<strong>Context-conflicting幻觉</strong>，即大型语言模型生成与其自己之前生成的信息相冲突的内容；<strong>Fact-conflicting幻觉</strong>，即大型语言模型生成不符合已确立的世界知识的内容。</li>
+<li>大语言模型幻觉的挑战来源（区别于一般模型）：<strong>Massive training data大规模训练数据</strong>：与为特定任务精心策划数据不同，LLM的预训练使用来自网络的数万亿词元，这使得难以消除<strong>虚构、过时或偏见</strong>信息。<strong>Versatility of LLMs LLM的多功能性</strong>：通用型LLM被期望在跨任务、跨语言和跨领域的环境中表现出色，这给幻觉的全面评估和缓解带来了挑战。<strong>Imperceptibility of errors错误的难以察觉性</strong>：作为其强大能力的副产品，LLM可能生成起初看似高度合理的虚假信息，这使得模型甚至人类难以检测到幻觉。</li>
+<li>除了幻觉以外的大语言模型问题：<strong>模糊性（Ambiguity）</strong>：这种问题发生在LLM的响应具有歧义，容易产生多种解释。响应不一定是错误的，但它未能提供对用户问题有用的答案。<strong>不完整性（Incompleteness）</strong>：不完整性问题发生在生成的响应是不完整或片段化的情况下。<strong>偏见（Bias）</strong>：LLMs中的偏见涉及到在生成的文本中表现出的不公平或偏见态度。这些偏见可能来源于训练数据，这些数据通常包括历史文本、文学作品、社交媒体内容和其他来源。这些来源可能本质上反映了社会偏见、性别偏见、刻板印象或歧视性信仰。<strong>信息不足（Under-informativeness）</strong>：这种问题指的是LLMs倾向于回避回答某些问题或提供特定信息，即使它们本应该有这个能力。例如，由于奖励模型的不完善，RLHF可能导致LLMs的过度优化，可能导致信息不足的状态。表2中呈现了一个例子，LLM拒绝回答用户的查询。</li>
+<li>LLM幻觉的评估：幻觉评估格式：基于生成事实性陈述或将其与非事实性陈述区分开的能力；幻觉评估方式：人工式（为生成的文本标注：支持、不支持、不相关。特点：带有主观性且成本高）、基于模型的自动评估（如单独训练GPT-judge来评估真实性）、基于规则的自动评估（准确度等指标）</li>
+<li>LLM幻觉的来源：<strong>缺乏相关知识或虚假知识</strong>、<strong>LLMs可能高估</strong>、<strong>问题对齐过程存在问题</strong>、。。。</li>
+<li>LLM幻觉的缓解（依照开发一个LLM的生命周期来进行阐述）：在预训练阶段缓解（LLM的知识主要是在预训练阶段获得，需考虑减少数据集中的噪音：人工筛选、自动选择等）、在监督式微调下的缓解、在RLHF时期缓解（利用人类反馈不仅可以缩小机器生成内容与人类偏好之间的差距，还有助于LLMs与期望的标准或目标保持一致）、推理时期缓解</li>
+</ul>
+<h2 id="大型视觉-语言模型中幻觉的评估与分析">大型视觉-语言模型中幻觉的评估与分析
+</h2><ul>
+<li>LVLM幻觉：回应并不在视觉输入中存在，这带来了潜在的重大风险后果。</li>
+<li>LVLM（mPLUG-Owl、MiniGPT-4、LLaVA）继承了VLPM（Vision-Language Pre-trained Models）和LLM（Large Language Models）的优势和缺点：对于VLPMs，挑战在于准确地表示抽象视觉编码中的视觉信息；对于LLMs来说，幻觉主要源自训练数据中存在噪音</li>
+<li>工作内容：发现了在理想化的幻觉场景中，LVLMs很容易受到提示的影响，导致结果与真实世界情境中的幻觉不相关；首次利用LLM进行LVLMs内的幻觉评估，提出的框架具有低成本、可重复性、隐私保护和本地部署</li>
+<li>动机：基于prompt来检验出的幻觉和真实场景下出现的幻觉没有必然联系</li>
+<li>方法：<strong>数据收集阶段</strong>：随机选择图片，用指令“描述这张图片”来查询LVLMs，并手动注释幻觉回应，以获取现实幻觉收集。随后，我们的目标是批量获取大量的幻觉数据。我们考虑使用ChatGPT通过手动构建基于提供的图像参考说明的提示来生成幻觉。我们通过人类相似性评估将ChatGPT生成的幻觉数据与现实幻觉数据进行比较。我们反复修改提示，使两者的模式能够紧密对齐，如图3右侧所示。我们的幻觉数据收集格式如图4所示。最后，我们收集非幻觉数据。通过请求ChatGPT基于参考说明生成详细描述，我们可以轻松获得所需的数据。但是，关键是要强调生成的描述必须严格遵循参考说明中存在的对象，不得引入任何不存在的元素、<strong>训练和推理阶段</strong>：在训练阶段，我们采用了与LLMs和指导微调的数据分布相一致的格式提示。前一步骤收集的数据被无缝地整合到提示中，作为通过自回归训练过程对LLM进行微调的训练数据。在推理阶段，我们将待评估的LVLMs的参考说明和回应合并到提示中。然后，将这些输入馈送到经过精心训练的评估模型中以获取判断结果。一旦数据收集和训练完成，HaELM可以多次重复使用，从而在保证可重复性的同时具有成本优势，这与ChatGPT相比。此外，HaELM是基于开源LLM构建的，允许本地部署，因此不需要上传数据，也能保障数据隐私。（感觉就是一个除噪筛选的过程：根据某种指令不断优化至贴合真实情况幻觉，然后筛选出干净的数据集）</li>
+</ul>
+<h1 id="思考">思考
+</h1><ul>
+<li>为什么是大语言模型会出现幻觉，一般的小模型会出现吗？还是说幻觉只是一种没训练好的性能模型——解决：在传统的自然语言生成（NLG）环境中已经广泛研究了幻觉问题《Survey of hallucination in natural language generation》</li>
+<li>思考LVLM的结构，是什么导致LVLM的幻觉可从结构出发</li>
+<li>为什么小模型的幻觉率（这里可以泛指准确率）要低一些，比如MAERec的OCR能力比GPT4V更强</li>
+<li>多模态幻觉的具体定义可参考LLM幻觉的定义分类</li>
+<li>根据现象LVLM的幻觉：1）在视觉指令中频繁出现或与图像中的物体共现的物体，很明显容易被大型视觉语言模型产生幻觉。即会让LVLM误以为这些事物之间有某种关联，这是对于训练数据而言。2）文本和视觉不匹配，如何准确获得图形token。由于当前的大型多模态模型是基于强大的大型语言模型构建的，它们可能过度依赖语言先验知识，生成更有可能与指令文本一起出现的单词，而不考虑图像内容（图像token和文本token不在同一个语义空间），LVLM整体训练时文本模态过强，可考虑对文本模态抑制平衡视觉和文本模态。参考《Aligning large multi-modal model with robust instruction tuning》。但是很难分辨出到底是哪一种原因导致的。</li>
+<li>原因及解决办法：1）大模型生成是自回归模式（可从LLM训练的方式入手：Bert完形填空、GPT），可能先前生成的错误信息，大模型无法对其进行纠正，导致错上加错。如MiniGPT-4无法对其纠正，需对大模型进行监督式的微调。2）可采用更强的对齐策略。</li>
+<li>LVLM检测方法：（1）图文匹配CLIP。（2）或者额外训练模型</li>
+<li>既然已经有了自动化评估幻觉的方法，为何还要单独构建一个数据集</li>
+<li>LVLM的模型架构与工具学习的关系：（1）LVLM先输入图片得到图片特征向量，然后经过转换层映射到大模型可以理解的特征。（2）输入指令（提示+工具信息）。总之，LVLM需要依据图片信息和工具信息共同做出判断。</li>
+<li>幻觉有很多类型：事实类型（其实是偏向于知识，专业称为unfaithful）、语义类型（和自身输出的逻辑矛盾或者无意义，inconsistent, or nonsensical）。个人偏向于不同的幻觉类型内部机理可能不一样，但是解决方法可以一统。</li>
+<li>基于后处理的，幻觉矫正和幻觉检测，个人认为花销很大的方法没有意义，如基于模型的方法，首先会第二次前向传播开销大，其次模型本身也具有幻觉不靠谱。如果是基于rule-base或者轻量级的classifier提醒用户注意幻觉是有意义的</li>
+<li>缓解幻觉的方法：（1）基于训练：但是根据目前来看，单次推理总是存在信息损失很难做到真正的幻觉缓解（2）基于推理：约束解码、o1式的多次推理或者利用memory有很大潜力</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2020 - 
+        
+        2025 Hugo Theme Stack Starter
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
